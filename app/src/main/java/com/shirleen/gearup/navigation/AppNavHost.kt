@@ -11,12 +11,18 @@ import com.shirleen.gearup.data.UserDatabase
 import com.shirleen.gearup.repository.UserRepository
 import com.shirleen.gearup.ui.screens.dashboards.BuyerDashboardScreen
 import com.shirleen.gearup.ui.screens.about.AboutScreen
+import com.shirleen.gearup.ui.screens.accessories.AccessoriesScreen
 import com.shirleen.gearup.ui.screens.home.HomeScreen
 import com.shirleen.gearup.ui.screens.splash.SplashScreen
 import com.shirleen.gearup.viewmodel.AuthViewModel
 
 import com.shirleen.gearup.ui.screens.auth.LoginScreen
 import com.shirleen.gearup.ui.screens.auth.RegisterScreen
+import com.shirleen.gearup.ui.screens.bookappointment.BookAppointmentScreen
+import com.shirleen.gearup.ui.screens.buycar.BuyCarScreen
+import com.shirleen.gearup.ui.screens.dashboards.SellerDashboardScreen
+import com.shirleen.gearup.ui.screens.explore.ExploreScreen
+import com.shirleen.gearup.ui.screens.services.ServicesScreen
 
 
 @Composable
@@ -47,6 +53,32 @@ fun AppNavHost(
         composable(ROUT_SPLASH) {
             SplashScreen(navController)
         }
+
+        composable(ROUT_BUYCAR) {
+            BuyCarScreen(navController)
+        }
+
+        composable(ROUT_SERVICES) {
+            ServicesScreen(navController)
+        }
+
+        composable(ROUT_ACCESSORIES) {
+            AccessoriesScreen(navController)
+        }
+
+        composable(ROUT_BOOKAPPOINTMENT) {
+            BookAppointmentScreen(navController)
+        }
+
+        composable(ROUT_EXPLORE) {
+            ExploreScreen(navController)
+        }
+
+        composable(ROUT_SELLERDASHBOARD) {
+            SellerDashboardScreen(navController)
+        }
+
+
 
 
         //AUTHENTICATION
