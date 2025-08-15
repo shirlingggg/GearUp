@@ -20,8 +20,12 @@ import com.shirleen.gearup.ui.screens.auth.LoginScreen
 import com.shirleen.gearup.ui.screens.auth.RegisterScreen
 import com.shirleen.gearup.ui.screens.bookappointment.BookAppointmentScreen
 import com.shirleen.gearup.ui.screens.buycar.BuyCarScreen
+import com.shirleen.gearup.ui.screens.profilescreens.BuyerProfileScreen
 import com.shirleen.gearup.ui.screens.dashboards.SellerDashboardScreen
+import com.shirleen.gearup.ui.screens.dashboards.ServiceProviderDashboardScreen
+import com.shirleen.gearup.ui.screens.profilescreens.ServiceProviderProfileScreen
 import com.shirleen.gearup.ui.screens.explore.ExploreScreen
+import com.shirleen.gearup.ui.screens.profilescreens.SellerProfileScreen
 import com.shirleen.gearup.ui.screens.services.ServicesScreen
 
 
@@ -77,6 +81,23 @@ fun AppNavHost(
         composable(ROUT_SELLERDASHBOARD) {
             SellerDashboardScreen(navController)
         }
+
+        composable(ROUT_SERVICEPROVIDERPROFILESCREEN) {
+            ServiceProviderProfileScreen(navController)
+        }
+
+        composable(ROUT_BUYERPROFILESCREEN) {
+            BuyerProfileScreen(navController)
+        }
+
+        composable(ROUT_SELLERPROFILESCREEN) {
+            SellerProfileScreen(navController)
+        }
+
+        composable(ROUT_SERVICEPROVIDERDASHBOARD) {
+            ServiceProviderDashboardScreen(navController)
+        }
+
 
 
 

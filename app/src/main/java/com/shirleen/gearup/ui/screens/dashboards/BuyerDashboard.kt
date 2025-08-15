@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Event
@@ -33,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.shirleen.gearup.navigation.ROUT_ACCESSORIES
 import com.shirleen.gearup.navigation.ROUT_BOOKAPPOINTMENT
 import com.shirleen.gearup.navigation.ROUT_BUYCAR
+import com.shirleen.gearup.navigation.ROUT_BUYERPROFILESCREEN
 import com.shirleen.gearup.navigation.ROUT_EXPLORE
 import com.shirleen.gearup.navigation.ROUT_SERVICES
 import com.shirleen.gearup.ui.theme.newBlue
@@ -69,18 +69,12 @@ fun BuyerDashboardScreen(navController: NavController) {
                     onClick = { navController.navigate(ROUT_EXPLORE) },
                     colors = navBarColors
                 )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Garage, contentDescription = "Garage") },
-                    label = { Text("My Garage") },
-                    selected = selectedIndex == 2,
-                    onClick = { selectedIndex = 2 },
-                    colors = navBarColors
-                )
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
                     selected = selectedIndex == 3,
-                    onClick = { selectedIndex = 3 },
+                    onClick = { navController.navigate(ROUT_BUYERPROFILESCREEN) },
                     colors = navBarColors
                 )
             }

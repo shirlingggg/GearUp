@@ -24,18 +24,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.shirleen.gearup.R
 import com.shirleen.gearup.navigation.ROUT_SELLERDASHBOARD
+import com.shirleen.gearup.navigation.ROUT_SELLERPROFILESCREEN
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
 
 // Data classes to represent a seller's listing (can be a car or accessory)
 data class SellerListing(val name: String, val price: String, val imageRes: Int, val isCar: Boolean)
-
-// Define the bottom navigation items for the seller
-data class SellerBottomNavItem(
-    val label: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector,
-    val route: String
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,12 +41,8 @@ fun SellerDashboardScreen(navController: NavController) {
         SellerListing("LED Headlights", "KSh 8,500", R.drawable.ledlights, false),
         SellerListing("Nissan X-Trail", "KSh 2,400,000", R.drawable.xtrail, true)
     )
-
-    val navBarItems = listOf(
-        SellerBottomNavItem("Dashboard", Icons.Default.Home, ROUT_SELLERDASHBOARD),
-        SellerBottomNavItem("Orders", Icons.Default.Assignment, ""),
-        SellerBottomNavItem("Profile", Icons.Default.Person, "")
-    )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     Scaffold(
         topBar = {
@@ -69,7 +59,64 @@ fun SellerDashboardScreen(navController: NavController) {
             )
         },
         bottomBar = {
-            SellerBottomNavigationBar(navController, navBarItems)
+            NavigationBar(containerColor = newBluu) {
+                // Home/Dashboard Icon
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Dashboard") },
+                    label = { Text("Dashboard") },
+                    selected = currentRoute == ROUT_SELLERDASHBOARD,
+                    onClick = {
+                        if (currentRoute != ROUT_SELLERDASHBOARD) {
+                            navController.navigate(ROUT_SELLERDASHBOARD) {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        }
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = newBlue,
+                        unselectedIconColor = Color.White,
+                        selectedTextColor = newBlue,
+                        unselectedTextColor = Color.White
+                    )
+                )
+
+                // Orders Icon
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Assignment, contentDescription = "Orders") },
+                    label = { Text("Orders") },
+                    selected = currentRoute == "ROUT_SELLER_ORDERS", // Placeholder for Orders route
+                    onClick = {
+                        if (currentRoute != "ROUT_SELLER_ORDERS") {
+                            navController.navigate("ROUT_SELLER_ORDERS")
+                        }
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = newBlue,
+                        unselectedIconColor = Color.White,
+                        selectedTextColor = newBlue,
+                        unselectedTextColor = Color.White
+                    )
+                )
+
+                // Profile Icon
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
+                    label = { Text("Profile") },
+                    selected = currentRoute == ROUT_SELLERPROFILESCREEN,
+                    onClick = {
+                        if (currentRoute != ROUT_SELLERPROFILESCREEN) {
+                            navController.navigate(ROUT_SELLERPROFILESCREEN)
+                        }
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = newBlue,
+                        unselectedIconColor = Color.White,
+                        selectedTextColor = newBlue,
+                        unselectedTextColor = Color.White
+                    )
+                )
+            }
         },
         content = { paddingValues ->
             LazyColumn(
@@ -187,34 +234,6 @@ fun ListingCard(listing: SellerListing) {
             IconButton(onClick = { /* Delete listing */ }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Gray)
             }
-        }
-    }
-}
-
-@Composable
-fun SellerBottomNavigationBar(navController: NavController, items: List<SellerBottomNavItem>) {
-    NavigationBar(containerColor = newBluu) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) },
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = newBlue,
-                    unselectedIconColor = Color.White,
-                    selectedTextColor = newBlue,
-                    unselectedTextColor = Color.White
-                )
-            )
         }
     }
 }

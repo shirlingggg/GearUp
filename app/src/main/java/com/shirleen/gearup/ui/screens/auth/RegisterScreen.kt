@@ -49,7 +49,7 @@ fun RegisterScreen(
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var role by remember { mutableStateOf("Buyer") }
-    val roleOptions = listOf("Buyer", "Seller")
+    val roleOptions = listOf("Buyer", "Seller", "Service Provider")
     var expanded by remember { mutableStateOf(false) }
 
     val animatedAlpha by animateFloatAsState(
