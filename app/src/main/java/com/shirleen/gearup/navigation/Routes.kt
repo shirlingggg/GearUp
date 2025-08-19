@@ -16,7 +16,16 @@ const val ROUT_ABOUT = "about"
 const val ROUT_SPLASH = "splash"
 
 
+
 //Auth
 
 const val ROUT_REGISTER= "register"
 const val ROUT_LOGIN= "login"
+
+//CRUD- Products
+const val ROUT_ADD_CAR = "add_product"
+const val ROUT_CAR_LIST = "car_list"
+const val ROUT_EDIT_CAR = "edit_car/{carId}"
+
+// ✅ Helper function for navigation
+fun editCarRoute(carId: Int) = "edit_car/$carId"

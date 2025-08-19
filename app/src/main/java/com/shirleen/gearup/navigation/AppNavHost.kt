@@ -1,12 +1,18 @@
 package com.shirleen.gearup.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.shirleen.gearup.data.UserDatabase
 import com.shirleen.gearup.repository.UserRepository
 import com.shirleen.gearup.ui.screens.dashboards.BuyerDashboardScreen
@@ -20,6 +26,9 @@ import com.shirleen.gearup.ui.screens.auth.LoginScreen
 import com.shirleen.gearup.ui.screens.auth.RegisterScreen
 import com.shirleen.gearup.ui.screens.bookappointment.BookAppointmentScreen
 import com.shirleen.gearup.ui.screens.buycar.BuyCarScreen
+import com.shirleen.gearup.ui.screens.cars.AddCarScreen
+import com.shirleen.gearup.ui.screens.cars.CarListScreen
+import com.shirleen.gearup.ui.screens.cars.EditCarScreen
 import com.shirleen.gearup.ui.screens.profilescreens.BuyerProfileScreen
 import com.shirleen.gearup.ui.screens.dashboards.SellerDashboardScreen
 import com.shirleen.gearup.ui.screens.dashboards.ServiceProviderDashboardScreen
@@ -27,16 +36,31 @@ import com.shirleen.gearup.ui.screens.profilescreens.ServiceProviderProfileScree
 import com.shirleen.gearup.ui.screens.explore.ExploreScreen
 import com.shirleen.gearup.ui.screens.profilescreens.SellerProfileScreen
 import com.shirleen.gearup.ui.screens.services.ServicesScreen
-
+import com.shirleen.gearup.viewmodel.CarViewModel
+import com.shirleen.gearup.viewmodel.CarViewModelFactory
+import com.shirleen.gearup.repository.CarRepository // Corrected: Import CarRepository
+import com.shirleen.gearup.data.CarDatabase // Corrected: Import CarDatabase
 
 @Composable
+@RequiresApi(Build.VERSION_CODES.Q)
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_BUYERDASHBOARD,
+    startDestination: String = ROUT_CAR_LIST,
 ) {
 
     val context = LocalContext.current
+
+    // Initialize ViewModels here to be shared across composables
+    val appDatabase = UserDatabase.getDatabase(context)
+    val authRepository = UserRepository(appDatabase.userDao())
+    val authViewModel: AuthViewModel = viewModel { AuthViewModel(authRepository) }
+
+    // Corrected: Initializing CarViewModel without AppContainer
+    val carDatabase = CarDatabase.getDatabase(context)
+    val carRepository = CarRepository(carDatabase.carDao())
+    val carViewModel: CarViewModel = viewModel { CarViewModelFactory(carRepository).create(CarViewModel::class.java) }
+
 
     NavHost(
         navController = navController,
@@ -99,15 +123,8 @@ fun AppNavHost(
         }
 
 
-
-
-
         //AUTHENTICATION
 
-        // Initialize Room Database and Repository for Authentication
-        val appDatabase = UserDatabase.getDatabase(context)
-        val authRepository = UserRepository(appDatabase.userDao())
-        val authViewModel: AuthViewModel = AuthViewModel(authRepository)
         composable(ROUT_REGISTER) {
             RegisterScreen(authViewModel, navController) {
                 navController.navigate(ROUT_LOGIN) {
@@ -126,11 +143,22 @@ fun AppNavHost(
 
         //end of authentication
 
+        //CRUD
+        //Cars
+        composable(ROUT_ADD_CAR) {
+            AddCarScreen(navController, carViewModel)
+        }
 
+        composable(ROUT_CAR_LIST) {
+            CarListScreen(navController, carViewModel)
+        }
 
-
-
+        composable(
+            route = ROUT_EDIT_CAR,
+            arguments = listOf(navArgument("carId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val carId = backStackEntry.arguments?.getInt("carId")
+            EditCarScreen(carId, navController, carViewModel)
+        }
     }
-
-
 }
