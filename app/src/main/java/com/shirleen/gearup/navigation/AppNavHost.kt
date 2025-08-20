@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.shirleen.gearup.data.AccessoryDatabase
 
 import com.shirleen.gearup.data.UserDatabase
 import com.shirleen.gearup.repository.UserRepository
@@ -40,13 +41,19 @@ import com.shirleen.gearup.viewmodel.CarViewModel
 import com.shirleen.gearup.viewmodel.CarViewModelFactory
 import com.shirleen.gearup.repository.CarRepository // Corrected: Import CarRepository
 import com.shirleen.gearup.data.CarDatabase // Corrected: Import CarDatabase
+import com.shirleen.gearup.repository.AccessoryRepository
+import com.shirleen.gearup.ui.screens.accessory.AccessoryListScreen
+import com.shirleen.gearup.ui.screens.accessory.AddAccessoryScreen
+import com.shirleen.gearup.ui.screens.accessory.EditAccessoryScreen
+import com.shirleen.gearup.viewmodel.AccessoryViewModel
+import com.shirleen.gearup.viewmodel.AccessoryViewModelFactory
 
 @Composable
 @RequiresApi(Build.VERSION_CODES.Q)
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_CAR_LIST,
+    startDestination: String = ROUT_BOOKAPPOINTMENT,
 ) {
 
     val context = LocalContext.current
@@ -60,6 +67,13 @@ fun AppNavHost(
     val carDatabase = CarDatabase.getDatabase(context)
     val carRepository = CarRepository(carDatabase.carDao())
     val carViewModel: CarViewModel = viewModel { CarViewModelFactory(carRepository).create(CarViewModel::class.java) }
+
+    // Create the ViewModel instance outside the NavHost
+    val accessoryViewModel: AccessoryViewModel = viewModel(
+        factory = AccessoryViewModelFactory(
+            AccessoryRepository(AccessoryDatabase.getDatabase(context).accessoryDao())
+        )
+    )
 
 
     NavHost(
@@ -160,5 +174,26 @@ fun AppNavHost(
             val carId = backStackEntry.arguments?.getInt("carId")
             EditCarScreen(carId, navController, carViewModel)
         }
+
+        //Accessories
+        composable(ROUT_ADD_ACCESSORY) {
+            AddAccessoryScreen(navController, accessoryViewModel)
+        }
+
+        composable(ROUT_ACCESSORY_LIST) {
+            AccessoryListScreen(navController, accessoryViewModel)
+        }
+
+        composable(
+            route = ROUT_EDIT_ACCESSORY,
+            arguments = listOf(navArgument("accessoryId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val accessoryId = backStackEntry.arguments?.getInt("accessoryId")
+            EditAccessoryScreen(accessoryId, navController, accessoryViewModel)
+        }
+
+
+
+
     }
 }

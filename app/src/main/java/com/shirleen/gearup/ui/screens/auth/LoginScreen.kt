@@ -26,9 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.shirleen.gearup.R
+import com.shirleen.gearup.navigation.ROUT_BUYERDASHBOARD
 import com.shirleen.gearup.navigation.ROUT_HOME
 
 import com.shirleen.gearup.navigation.ROUT_REGISTER
+import com.shirleen.gearup.navigation.ROUT_SELLERDASHBOARD
+import com.shirleen.gearup.navigation.ROUT_SERVICEPROVIDERDASHBOARD
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
 
@@ -51,9 +54,12 @@ fun LoginScreen(
                 Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
             } else {
                 if (user.role == "Buyer") {
-                    navController.navigate(ROUT_HOME) {}
-                } else {
-                    navController.navigate(ROUT_HOME) {}
+                    navController.navigate(ROUT_BUYERDASHBOARD) {}
+                } else if (user.role == "Seller"){
+                    navController.navigate(ROUT_SELLERDASHBOARD) {}
+                }
+                else{
+                    navController.navigate(ROUT_SERVICEPROVIDERDASHBOARD)
                 }
             }
         }

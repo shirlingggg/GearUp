@@ -23,9 +23,14 @@ const val ROUT_REGISTER= "register"
 const val ROUT_LOGIN= "login"
 
 //CRUD- Products
-const val ROUT_ADD_CAR = "add_product"
+const val ROUT_ADD_CAR = "add_car"
+const val ROUT_ADD_ACCESSORY = "add_accessory"
+const val ROUT_ADD_SERVICE = "add_service"
 const val ROUT_CAR_LIST = "car_list"
+const val ROUT_ACCESSORY_LIST = "accessory_list"
 const val ROUT_EDIT_CAR = "edit_car/{carId}"
+const val ROUT_EDIT_ACCESSORY = "edit_accessory/{accessoryId}"
 
 // ✅ Helper function for navigation
 fun editCarRoute(carId: Int) = "edit_car/$carId"
+fun editAccessoryRoute(accessoryId: Int) = "edit_accessory/$accessoryId"

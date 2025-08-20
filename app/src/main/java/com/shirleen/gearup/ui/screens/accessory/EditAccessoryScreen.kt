@@ -1,4 +1,4 @@
-package com.shirleen.gearup.ui.screens.cars
+package com.shirleen.gearup.ui.screens.accessory
 
 import android.net.Uri
 import android.widget.Toast
@@ -12,11 +12,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,43 +26,41 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.shirleen.gearup.navigation.ROUT_ADD_CAR
-import com.shirleen.gearup.navigation.ROUT_CAR_LIST
-import com.shirleen.gearup.viewmodel.CarViewModel
-import androidx.compose.runtime.collectAsState
+import com.shirleen.gearup.navigation.ROUT_ADD_ACCESSORY
+import com.shirleen.gearup.navigation.ROUT_ACCESSORY_LIST
 import com.shirleen.gearup.ui.theme.newBluu
+import com.shirleen.gearup.viewmodel.AccessoryViewModel
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewModel) {
+fun EditAccessoryScreen(accessoryId: Int?, navController: NavController, viewModel: AccessoryViewModel) {
     val context = LocalContext.current
-    val allCars by viewModel.cars.collectAsState()
+    val allAccessories by viewModel.allAccessories.collectAsState(initial = emptyList())
 
-    val car = remember(allCars) { allCars.find { it.id == carId } }
+    // Find the accessory by ID
+    val accessory = allAccessories.find { it.id == accessoryId }
 
-    // Local editable states
-    var brand by remember { mutableStateOf("") }
-    var model by remember { mutableStateOf("") }
-    var yearOfManufacture by remember { mutableStateOf("") }
-    var mileage by remember { mutableStateOf("") }
+    // Editable states
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf("") }
     var showMenu by remember { mutableStateOf(false) }
 
-    // Sync states with car whenever car changes
-    LaunchedEffect(car) {
-        car?.let {
-            brand = it.brand
-            model = it.model
-            yearOfManufacture = it.yearOfManufacture
-            mileage = it.mileage
+    // Update states when accessory is loaded
+    LaunchedEffect(accessory) {
+        accessory?.let {
+            name = it.name
+            description = it.description
             price = it.price
             phone = it.phone
             imageUri = it.imageUri
         }
     }
 
+    // Image picker
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             imageUri = it.toString()
@@ -75,7 +71,7 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Car", color = Color.White) },
+                title = { Text("Edit Accessory", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -90,16 +86,16 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Car List") },
+                            text = { Text("Accessory List") },
                             onClick = {
-                                navController.navigate(ROUT_CAR_LIST)
+                                navController.navigate(ROUT_ACCESSORY_LIST)
                                 showMenu = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Add Car") },
+                            text = { Text("Add Accessory") },
                             onClick = {
-                                navController.navigate(ROUT_ADD_CAR)
+                                navController.navigate(ROUT_ADD_ACCESSORY)
                                 showMenu = false
                             }
                         )
@@ -108,9 +104,9 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                 colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = newBluu)
             )
         },
-        bottomBar = { BottomNavigationBar2(navController) }
+        bottomBar = { BottomNavigationBarAccessory(navController) }
     ) { paddingValues ->
-        if (car != null) {
+        if (accessory != null) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -121,9 +117,9 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
             ) {
                 item {
                     OutlinedTextField(
-                        value = brand,
-                        onValueChange = { brand = it },
-                        label = { Text("Car Brand") },
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Accessory Name") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = newBluu,
@@ -134,37 +130,9 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                 }
                 item {
                     OutlinedTextField(
-                        value = model,
-                        onValueChange = { model = it },
-                        label = { Text("Car Model") },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = newBluu,
-                            focusedLabelColor = newBluu,
-                            cursorColor = newBluu
-                        )
-                    )
-                }
-                item {
-                    OutlinedTextField(
-                        value = yearOfManufacture,
-                        onValueChange = { yearOfManufacture = it },
-                        label = { Text("Year of Manufacture") },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = newBluu,
-                            focusedLabelColor = newBluu,
-                            cursorColor = newBluu
-                        )
-                    )
-                }
-                item {
-                    OutlinedTextField(
-                        value = mileage,
-                        onValueChange = { mileage = it },
-                        label = { Text("Car Mileage") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text("Description") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = newBluu,
@@ -177,7 +145,7 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                     OutlinedTextField(
                         value = price,
                         onValueChange = { price = it },
-                        label = { Text("Car Price") },
+                        label = { Text("Price") },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -212,14 +180,14 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                         if (imageUri.isNotEmpty()) {
                             Image(
                                 painter = rememberAsyncImagePainter(model = Uri.parse(imageUri)),
-                                contentDescription = "Car Image",
+                                contentDescription = "Accessory Image",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(
-                                    imageVector = Icons.Default.Add,
+                                    imageVector = Icons.Default.AddAPhoto,
                                     contentDescription = "Pick Image",
                                     tint = Color.DarkGray
                                 )
@@ -231,61 +199,42 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                 item {
                     Button(
                         onClick = {
-                            val updatedCar = car.copy(
-                                brand = brand,
-                                model = model,
-                                yearOfManufacture = yearOfManufacture,
-                                mileage = mileage,
+                            val updatedAccessory = accessory.copy(
+                                name = name,
+                                description = description,
                                 price = price,
                                 phone = phone,
                                 imageUri = imageUri
                             )
-                            viewModel.updateCar(updatedCar)
-                            Toast.makeText(context, "Car Updated!", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
+                            viewModel.updateAccessory(updatedAccessory)
+                            Toast.makeText(context, "Accessory Updated!", Toast.LENGTH_SHORT).show()
+                            navController.navigate(ROUT_ACCESSORY_LIST) {
+                                popUpTo(ROUT_ACCESSORY_LIST) { inclusive = true }
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 40.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = newBluu)
                     ) {
-                        Text("Update Car", color = Color.White)
+                        Text("Update Accessory", color = Color.White)
                     }
                 }
             }
         } else {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "Car not found", color = MaterialTheme.colorScheme.error)
+                Text(text = "Accessory not found", color = MaterialTheme.colorScheme.error)
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { navController.popBackStack() }) {
                     Text("Go Back")
                 }
             }
         }
-    }
-}
-
-@Composable
-fun BottomNavigationBar2(navController: NavController) {
-    NavigationBar(
-        containerColor = newBluu,
-        contentColor = Color.White
-    ) {
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_CAR_LIST) },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Car List", tint = Color.White) },
-            label = { Text("Car List", color = Color.White) }
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_ADD_CAR) },
-            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Car", tint = Color.White) },
-            label = { Text("Add Car", color = Color.White) }
-        )
     }
 }

@@ -1,4 +1,4 @@
-package com.shirleen.gearup.ui.screens.cars
+package com.shirleen.gearup.ui.screens.accessory
 
 import android.content.ContentValues
 import android.content.Context
@@ -22,9 +22,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,39 +34,36 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.shirleen.gearup.R
-import com.shirleen.gearup.model.Car
-import com.shirleen.gearup.navigation.ROUT_ADD_CAR
-import com.shirleen.gearup.navigation.ROUT_CAR_LIST
-import com.shirleen.gearup.navigation.editCarRoute
-import com.shirleen.gearup.viewmodel.CarViewModel
+import com.shirleen.gearup.model.Accessory
+import com.shirleen.gearup.navigation.ROUT_ADD_ACCESSORY
+import com.shirleen.gearup.navigation.ROUT_ACCESSORY_LIST
+import com.shirleen.gearup.navigation.editAccessoryRoute
+import com.shirleen.gearup.viewmodel.AccessoryViewModel
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
+import com.shirleen.gearup.ui.screens.cars.CarItem
 import com.shirleen.gearup.ui.theme.newBluu
-
 import java.io.IOException
 import java.io.OutputStream
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
-    val carList by viewModel.cars.collectAsState()
+fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewModel) {
+    val allAccessories by viewModel.allAccessories.collectAsState(initial = emptyList())
     var showMenu by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
-    val filteredCars = carList.filter {
-        it.brand.contains(searchQuery, ignoreCase = true) ||
-                it.model.contains(searchQuery, ignoreCase = true)
-
+    val filteredAccessories = allAccessories.filter {
+        it.name.contains(searchQuery, ignoreCase = true)
     }
 
     Scaffold(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text("Cars", fontSize = 20.sp) },
+                    title = { Text("Accessories", fontSize = 20.sp) },
                     colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = newBluu,
                         titleContentColor = Color.White
@@ -80,23 +77,22 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                             onDismissRequest = { showMenu = false }
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Car List") },
+                                text = { Text("Accessory List") },
                                 onClick = {
-                                    navController.navigate(ROUT_CAR_LIST)
+                                    navController.navigate(ROUT_ACCESSORY_LIST)
                                     showMenu = false
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Add Car") },
+                                text = { Text("Add Accessory") },
                                 onClick = {
-                                    navController.navigate(ROUT_ADD_CAR)
+                                    navController.navigate(ROUT_ADD_ACCESSORY)
                                     showMenu = false
                                 }
                             )
                         }
                     }
                 )
-
 
                 //Search Bar
                 OutlinedTextField(
@@ -105,7 +101,7 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                    placeholder = { Text("Search cars...") },
+                    placeholder = { Text("Search accessories...") },
                     singleLine = true,
                     leadingIcon = {
                         Icon(
@@ -121,10 +117,8 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                         unfocusedTextColor = Color.DarkGray
                     )
                 )
-                Spacer(modifier = Modifier.height(16.dp))
 
-                //OOPS
-                if (filteredCars.isEmpty()) {
+                if (filteredAccessories.isEmpty()) {
                     Text(
                         text = "Oops! We don't have that.",
                         modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
@@ -134,17 +128,45 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                 } else {
                     LazyColumn {
 
-                        items(filteredCars) { car ->
-                                CarItem(navController, car, viewModel)
-                            }
+                        items(filteredAccessories) { accessory ->
+                            AccessoryItem(navController, accessory, viewModel)
+                        }
 
 
                     }
                 }
-
             }
         },
-        bottomBar = { BottomNavigationBar1(navController) },
+
+        bottomBar = {  NavigationBar(
+            containerColor = newBluu,
+            contentColor = Color.White
+        ) {
+            NavigationBarItem(
+                selected = false,
+                onClick = { navController.navigate(ROUT_ACCESSORY_LIST) },
+                icon = { Icon(Icons.Default.Home, contentDescription = "Accessory List") },
+                label = { Text("Home") },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    unselectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    unselectedTextColor = Color.White
+                )
+            )
+            NavigationBarItem(
+                selected = false,
+                onClick = { navController.navigate(ROUT_ADD_ACCESSORY) },
+                icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Accessory") },
+                label = { Text("Add") },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    unselectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    unselectedTextColor = Color.White
+                )
+            )
+        }},
         containerColor = Color.LightGray
     ) { paddingValues ->
         Column(
@@ -153,19 +175,30 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            LazyColumn {
-                items(filteredCars) { car ->
-                    CarItem(navController, car, viewModel)
+            if (filteredAccessories.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "No accessories found. Click '+' to add one.")
+                }
+            } else {
+                LazyColumn {
+                    items(filteredAccessories) { accessory ->
+                        AccessoryItem(navController, accessory, viewModel)
+                    }
                 }
             }
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
+fun AccessoryItem(navController: NavController, accessory: Accessory, viewModel: AccessoryViewModel) {
     val painter: Painter = rememberAsyncImagePainter(
-        model = car.imageUri?.let { Uri.parse(it) } ?: Uri.EMPTY
+        model = accessory.imageUri?.let { Uri.parse(it) } ?: Uri.EMPTY
     )
     val context = LocalContext.current
 
@@ -174,8 +207,8 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .clickable {
-                if (car.id != 0) {
-                    navController.navigate(editCarRoute(car.id))
+                if (accessory.id != 0) {
+                    navController.navigate(editAccessoryRoute(accessory.id))
                 }
             },
         shape = RoundedCornerShape(12.dp),
@@ -186,47 +219,37 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
             // Product Image
             Image(
                 painter = painter,
-                contentDescription = "Car Image",
+                contentDescription = "Accessory Image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
                 contentScale = ContentScale.Crop
             )
 
-            // Car Info and Buttons
+            // Accessory Info and Buttons
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp)
             ) {
-                // Car Details
+                // Accessory Details
                 Text(
-                    text = "Brand: ${car.brand}",
+                    text = "Name: ${accessory.name}",
                     fontSize = 20.sp,
                     color = Color.Black
                 )
-
                 Text(
-                    text = "Model: ${car.model}",
+                    text = "Description: ${accessory.description}",
                     fontSize = 16.sp,
                     color = Color.Black
                 )
-
                 Text(
-                    text = "Year: ${car.yearOfManufacture}",
+                    text = "Price: Ksh${accessory.price}",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Black
-                )
-
-                Text(
-                    text = "Mileage: ${car.mileage}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
                     color = Color.Black
                 )
                 Text(
-                    text = "Price: Ksh${car.price}",
+                    text = "Seller Phone: ${accessory.phone}",
                     fontSize = 16.sp,
                     color = Color.Black
                 )
@@ -242,7 +265,7 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                     Button(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
-                            smsIntent.data = "smsto:${car.phone}".toUri()
+                            smsIntent.data = "smsto:${accessory.phone}".toUri()
                             smsIntent.putExtra("sms_body", "Hello Seller,...?")
                             context.startActivity(smsIntent)
                         },
@@ -262,10 +285,10 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                         }
                     }
 
-                    // Edit Car
+                    // Edit Accessory
                     IconButton(
                         onClick = {
-                            navController.navigate(editCarRoute(car.id))
+                            navController.navigate(editAccessoryRoute(accessory.id))
                         }
                     ) {
                         Icon(
@@ -275,9 +298,9 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                         )
                     }
 
-                    // Delete Car
+                    // Delete Accessory
                     IconButton(
-                        onClick = { viewModel.deleteCar(car) }
+                        onClick = { viewModel.deleteAccessory(accessory) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -288,11 +311,12 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
 
                     // Download PDF
                     IconButton(
-                        onClick = { generateProductPDF(context, car) }
+                        onClick = { generateAccessoryPDF(context, accessory) }
                     ) {
+                        // Using a placeholder icon since R.drawable.download is not available for accessories
                         Icon(
-                            painter = painterResource(R.drawable.download),
-                            contentDescription = "",
+                            imageVector = Icons.Default.Download,
+                            contentDescription = "Download PDF",
                             tint = newBluu
                         )
                     }
@@ -303,7 +327,7 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
-fun generateProductPDF(context: Context, car: Car) {
+fun generateAccessoryPDF(context: Context, accessory: Accessory) {
     val pdfDocument = PdfDocument()
     val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()
     val page = pdfDocument.startPage(pageInfo)
@@ -311,7 +335,7 @@ fun generateProductPDF(context: Context, car: Car) {
     val paint = android.graphics.Paint()
 
     val bitmap: Bitmap? = try {
-        car.imageUri?.let {
+        accessory.imageUri?.let {
             val uri = Uri.parse(it)
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 BitmapFactory.decodeStream(inputStream)
@@ -329,21 +353,19 @@ fun generateProductPDF(context: Context, car: Car) {
 
     paint.textSize = 16f
     paint.isFakeBoldText = true
-    canvas.drawText("Car Details", 80f, 200f, paint)
+    canvas.drawText("Accessory Details", 80f, 200f, paint)
 
     paint.textSize = 12f
     paint.isFakeBoldText = false
-    canvas.drawText("Brand: ${car.brand}", 50f, 230f, paint)
-    canvas.drawText("Model: ${car.model}", 50f, 250f, paint)
-    canvas.drawText("Year of Manufacture: ${car.yearOfManufacture}", 50f, 270f, paint)
-    canvas.drawText("Mileage: ${car.mileage}", 50f, 290f, paint)
-    canvas.drawText("Price: Ksh${car.price}", 50f, 310f, paint)
-    canvas.drawText("Seller Phone: ${car.phone}", 50f, 330f, paint)
+    canvas.drawText("Name: ${accessory.name}", 50f, 230f, paint)
+    canvas.drawText("Description: ${accessory.description}", 50f, 250f, paint)
+    canvas.drawText("Price: Ksh${accessory.price}", 50f, 270f, paint)
+    canvas.drawText("Seller Phone: ${accessory.phone}", 50f, 290f, paint)
 
     pdfDocument.finishPage(page)
 
     // Save PDF using MediaStore (Scoped Storage)
-    val fileName = "${car.brand}_Details.pdf"
+    val fileName = "${accessory.name}_Details.pdf"
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
         put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
@@ -372,36 +394,4 @@ fun generateProductPDF(context: Context, car: Car) {
     pdfDocument.close()
 }
 
-// Bottom Navigation Bar Component
-@Composable
-fun BottomNavigationBar1(navController: NavController) {
-    NavigationBar(
-        containerColor = newBluu,
-        contentColor = Color.White
-    ) {
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_CAR_LIST) },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Car List") },
-            label = { Text("Home") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.White,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.White
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_ADD_CAR) },
-            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Car") },
-            label = { Text("Add") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.White,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.White
-            )
-        )
-    }
-}
+
