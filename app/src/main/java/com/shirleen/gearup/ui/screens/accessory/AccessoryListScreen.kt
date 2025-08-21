@@ -1,6 +1,5 @@
 package com.shirleen.gearup.ui.screens.accessory
 
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -43,7 +42,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
-import com.shirleen.gearup.ui.screens.cars.CarItem
 import com.shirleen.gearup.ui.theme.newBluu
 import java.io.IOException
 import java.io.OutputStream
@@ -51,7 +49,11 @@ import java.io.OutputStream
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewModel) {
+fun AccessoryListScreen(
+    navController: NavController,
+    viewModel: AccessoryViewModel,
+    isSeller: Boolean = true // 👈 flag to determine seller vs buyer
+) {
     val allAccessories by viewModel.allAccessories.collectAsState(initial = emptyList())
     var showMenu by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -70,28 +72,34 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
                         titleContentColor = Color.White
                     ),
                     actions = {
+
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu", tint = Color.White)
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Accessory List") },
-                                onClick = {
-                                    navController.navigate(ROUT_ACCESSORY_LIST)
-                                    showMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Add Accessory") },
-                                onClick = {
-                                    navController.navigate(ROUT_ADD_ACCESSORY)
-                                    showMenu = false
-                                }
-                            )
-                        }
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Menu",
+                                    tint = Color.White
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Accessory List") },
+                                    onClick = {
+                                        navController.navigate(ROUT_ACCESSORY_LIST)
+                                        showMenu = false
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Add Accessory") },
+                                    onClick = {
+                                        navController.navigate(ROUT_ADD_ACCESSORY)
+                                        showMenu = false
+                                    }
+                                )
+                            }
+
                     }
                 )
 
@@ -104,7 +112,6 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
                     shape = RoundedCornerShape(16.dp),
                     color = Color.White,
                 ) {
-                    //Search Bar
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -130,7 +137,6 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-
                 if (filteredAccessories.isEmpty()) {
                     Text(
                         text = "Oops! We don't have that.",
@@ -139,47 +145,64 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
                         color = Color.Gray
                     )
                 } else {
-                    LazyColumn {
-
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
                         items(filteredAccessories) { accessory ->
-                            AccessoryItem(navController, accessory, viewModel)
+                            AccessoryItem(navController, accessory, viewModel, isSeller)
                         }
-
-
                     }
                 }
             }
         },
 
-        bottomBar = {  NavigationBar(
-            containerColor = newBluu,
-            contentColor = Color.White
-        ) {
-            NavigationBarItem(
-                selected = false,
-                onClick = { navController.navigate(ROUT_ACCESSORY_LIST) },
-                icon = { Icon(Icons.Default.Home, contentDescription = "Accessory List") },
-                label = { Text("Home") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    unselectedIconColor = Color.White,
-                    selectedTextColor = Color.White,
-                    unselectedTextColor = Color.White
+        bottomBar = {
+            NavigationBar(
+                containerColor = newBluu,
+                contentColor = Color.White
+            ) {
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate(ROUT_ACCESSORY_LIST) },
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Accessory List") },
+                    label = { Text("Home") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color.White,
+                        unselectedIconColor = Color.White,
+                        selectedTextColor = Color.White,
+                        unselectedTextColor = Color.White
+                    )
                 )
-            )
-            NavigationBarItem(
-                selected = false,
-                onClick = { navController.navigate(ROUT_ADD_ACCESSORY) },
-                icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Accessory") },
-                label = { Text("Add") },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    unselectedIconColor = Color.White,
-                    selectedTextColor = Color.White,
-                    unselectedTextColor = Color.White
-                )
-            )
-        }},
+
+                if (isSeller) {
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { navController.navigate(ROUT_ADD_ACCESSORY) },
+                        icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Accessory") },
+                        label = { Text("Add") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.White,
+                            unselectedIconColor = Color.White,
+                            selectedTextColor = Color.White,
+                            unselectedTextColor = Color.White
+                        )
+                    )
+                } else {
+                    NavigationBarItem(
+                        selected = false,
+                        onClick = { /* Navigate to Cart */ },
+                        icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
+                        label = { Text("Cart") },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.White,
+                            unselectedIconColor = Color.White,
+                            selectedTextColor = Color.White,
+                            unselectedTextColor = Color.White
+                        )
+                    )
+                }
+            }
+        },
         containerColor = Color.LightGray
     ) { paddingValues ->
         Column(
@@ -197,9 +220,11 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
                     Text(text = "No accessories found. Click '+' to add one.")
                 }
             } else {
-                LazyColumn {
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 80.dp)
+                ) {
                     items(filteredAccessories) { accessory ->
-                        AccessoryItem(navController, accessory, viewModel)
+                        AccessoryItem(navController, accessory, viewModel, isSeller)
                     }
                 }
             }
@@ -209,7 +234,12 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun AccessoryItem(navController: NavController, accessory: Accessory, viewModel: AccessoryViewModel) {
+fun AccessoryItem(
+    navController: NavController,
+    accessory: Accessory,
+    viewModel: AccessoryViewModel,
+    isSeller: Boolean
+) {
     val painter: Painter = rememberAsyncImagePainter(
         model = accessory.imageUri?.let { Uri.parse(it) } ?: Uri.EMPTY
     )
@@ -229,57 +259,37 @@ fun AccessoryItem(navController: NavController, accessory: Accessory, viewModel:
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Product Image
             Image(
                 painter = painter,
                 contentDescription = "Accessory Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(280.dp),
                 contentScale = ContentScale.Crop
             )
 
-            // Accessory Info and Buttons
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp)
             ) {
-                // Accessory Details
-                Text(
-                    text = "Name: ${accessory.name}",
-                    fontSize = 20.sp,
-                    color = Color.Black
-                )
-                Text(
-                    text = "Description: ${accessory.description}",
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
-                Text(
-                    text = "Price: Ksh${accessory.price}",
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
-                Text(
-                    text = "Seller Phone: ${accessory.phone}",
-                    fontSize = 16.sp,
-                    color = Color.Black
-                )
+                Text(text = accessory.name, fontSize = 20.sp, color = Color.DarkGray)
+                Text(text = accessory.description, fontSize = 16.sp, color = Color.DarkGray)
+                Text(text = "Ksh ${accessory.price}", fontSize = 16.sp, color = Color.DarkGray)
+                Text(text = "Seller: ${accessory.phone}", fontSize = 16.sp, color = Color.DarkGray)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Buttons (Message, Edit, Delete, Download PDF)
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Message Seller
+                    // Message Seller (visible to both)
                     Button(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
                             smsIntent.data = "smsto:${accessory.phone}".toUri()
-                            smsIntent.putExtra("sms_body", "Hello Seller,...?")
+                            smsIntent.putExtra("sms_body", "Hello, I'm inerested in ${accessory.name}, could you tell me more about it...")
                             context.startActivity(smsIntent)
                         },
                         shape = RoundedCornerShape(8.dp),
@@ -289,122 +299,37 @@ fun AccessoryItem(navController: NavController, accessory: Accessory, viewModel:
                         )
                     ) {
                         Row {
-                            Icon(
-                                imageVector = Icons.Default.Send,
-                                contentDescription = "Message Seller"
-                            )
+                            Icon(imageVector = Icons.Default.Send, contentDescription = "Message Seller")
                             Spacer(modifier = Modifier.width(3.dp))
                             Text(text = "Message Seller")
                         }
                     }
 
-                    // Edit Accessory
-                    IconButton(
-                        onClick = {
-                            navController.navigate(editAccessoryRoute(accessory.id))
+                    if (isSeller) {
+                        // Edit Accessory
+                        IconButton(
+                            onClick = { navController.navigate(editAccessoryRoute(accessory.id)) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                tint = newBluu
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = newBluu
-                        )
-                    }
 
-                    // Delete Accessory
-                    IconButton(
-                        onClick = { viewModel.deleteAccessory(accessory) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red
-                        )
-                    }
-
-                    // Download PDF
-                    IconButton(
-                        onClick = { generateAccessoryPDF(context, accessory) }
-                    ) {
-                        // Using a placeholder icon since R.drawable.download is not available for accessories
-                        Icon(
-                            imageVector = Icons.Default.Download,
-                            contentDescription = "Download PDF",
-                            tint = newBluu
-                        )
+                        // Delete Accessory
+                        IconButton(
+                            onClick = { viewModel.deleteAccessory(accessory) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.Q)
-fun generateAccessoryPDF(context: Context, accessory: Accessory) {
-    val pdfDocument = PdfDocument()
-    val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()
-    val page = pdfDocument.startPage(pageInfo)
-    val canvas = page.canvas
-    val paint = android.graphics.Paint()
-
-    val bitmap: Bitmap? = try {
-        accessory.imageUri?.let {
-            val uri = Uri.parse(it)
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)
-            }
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-
-    bitmap?.let {
-        val scaledBitmap = Bitmap.createScaledBitmap(it, 250, 150, false)
-        canvas.drawBitmap(scaledBitmap, 25f, 20f, paint)
-    }
-
-    paint.textSize = 16f
-    paint.isFakeBoldText = true
-    canvas.drawText("Accessory Details", 80f, 200f, paint)
-
-    paint.textSize = 12f
-    paint.isFakeBoldText = false
-    canvas.drawText("Name: ${accessory.name}", 50f, 230f, paint)
-    canvas.drawText("Description: ${accessory.description}", 50f, 250f, paint)
-    canvas.drawText("Price: Ksh${accessory.price}", 50f, 270f, paint)
-    canvas.drawText("Seller Phone: ${accessory.phone}", 50f, 290f, paint)
-
-    pdfDocument.finishPage(page)
-
-    // Save PDF using MediaStore (Scoped Storage)
-    val fileName = "${accessory.name}_Details.pdf"
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-        put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf")
-        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
-    }
-
-    val contentResolver = context.contentResolver
-    val uri = contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-
-    if (uri != null) {
-        try {
-            val outputStream: OutputStream? = contentResolver.openOutputStream(uri)
-            if (outputStream != null) {
-                pdfDocument.writeTo(outputStream)
-                Toast.makeText(context, "PDF saved to Downloads!", Toast.LENGTH_LONG).show()
-            }
-            outputStream?.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(context, "Failed to save PDF!", Toast.LENGTH_LONG).show()
-        }
-    } else {
-        Toast.makeText(context, "Failed to create file!", Toast.LENGTH_LONG).show()
-    }
-
-    pdfDocument.close()
-}
-
-
