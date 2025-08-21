@@ -45,6 +45,9 @@ import com.shirleen.gearup.repository.AccessoryRepository
 import com.shirleen.gearup.ui.screens.accessory.AccessoryListScreen
 import com.shirleen.gearup.ui.screens.accessory.AddAccessoryScreen
 import com.shirleen.gearup.ui.screens.accessory.EditAccessoryScreen
+import com.shirleen.gearup.ui.screens.cart.CartScreen
+import com.shirleen.gearup.ui.screens.checkout.CheckOutScreen
+import com.shirleen.gearup.ui.screens.checkout.PaymentSuccessScreen
 import com.shirleen.gearup.viewmodel.AccessoryViewModel
 import com.shirleen.gearup.viewmodel.AccessoryViewModelFactory
 
@@ -53,7 +56,7 @@ import com.shirleen.gearup.viewmodel.AccessoryViewModelFactory
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = ROUT_BOOKAPPOINTMENT,
+    startDestination: String = ROUT_SPLASH,
 ) {
 
     val context = LocalContext.current
@@ -134,6 +137,18 @@ fun AppNavHost(
 
         composable(ROUT_SERVICEPROVIDERDASHBOARD) {
             ServiceProviderDashboardScreen(navController)
+        }
+
+        composable(ROUT_CART) {
+            CartScreen(navController)
+        }
+
+        composable(ROUT_PAYMENT) {
+            PaymentSuccessScreen(navController = navController)
+        }
+
+        composable(ROUT_CHECKOUT) {
+            CheckOutScreen(navController = navController)
         }
 
 

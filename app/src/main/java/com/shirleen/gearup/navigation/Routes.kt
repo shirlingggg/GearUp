@@ -14,6 +14,9 @@ const val ROUT_BUYERPROFILESCREEN = "buyerprofilescreen"
 const val ROUT_HOME = "home"
 const val ROUT_ABOUT = "about"
 const val ROUT_SPLASH = "splash"
+const val ROUT_CART = "cart"
+const val ROUT_PAYMENT = "payment"
+const val ROUT_CHECKOUT = "checkout"
 
 
 

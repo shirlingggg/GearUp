@@ -40,6 +40,7 @@ import com.shirleen.gearup.navigation.ROUT_ACCESSORY_LIST
 import com.shirleen.gearup.navigation.editAccessoryRoute
 import com.shirleen.gearup.viewmodel.AccessoryViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.style.TextAlign
 import com.shirleen.gearup.ui.screens.cars.CarItem
@@ -95,28 +96,40 @@ fun AccessoryListScreen(navController: NavController, viewModel: AccessoryViewMo
                 )
 
                 //Search Bar
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    placeholder = { Text("Search accessories...") },
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = newBluu
+                        .padding(top = 16.dp, start = 10.dp, end = 10.dp)
+                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                ) {
+                    //Search Bar
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        placeholder = { Text("Search cars...") },
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = newBluu
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = Color.White,
+                            focusedBorderColor = Color.White,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.DarkGray
                         )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = newBluu,
-                        unfocusedBorderColor = newBluu,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.DarkGray
                     )
-                )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
 
                 if (filteredAccessories.isEmpty()) {
                     Text(

@@ -42,6 +42,7 @@ import com.shirleen.gearup.navigation.editCarRoute
 import com.shirleen.gearup.viewmodel.CarViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
 import com.shirleen.gearup.ui.theme.newBluu
 
@@ -59,7 +60,6 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
     val filteredCars = carList.filter {
         it.brand.contains(searchQuery, ignoreCase = true) ||
                 it.model.contains(searchQuery, ignoreCase = true)
-
     }
 
     Scaffold(
@@ -97,30 +97,38 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                     }
                 )
 
-
-                //Search Bar
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    placeholder = { Text("Search cars...") },
-                    singleLine = true,
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = newBluu
+                        .padding(top = 16.dp, start = 10.dp, end = 10.dp)
+                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.White,
+                ) {
+                    //Search Bar
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        placeholder = { Text("Search cars...") },
+                        singleLine = true,
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = newBluu
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = Color.White,
+                            focusedBorderColor = Color.White,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.DarkGray
                         )
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = newBluu,
-                        unfocusedBorderColor = newBluu,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.DarkGray
                     )
-                )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 //OOPS
@@ -131,17 +139,7 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                         textAlign = TextAlign.Center,
                         color = Color.Gray
                     )
-                } else {
-                    LazyColumn {
-
-                        items(filteredCars) { car ->
-                                CarItem(navController, car, viewModel)
-                            }
-
-
-                    }
                 }
-
             }
         },
         bottomBar = { BottomNavigationBar1(navController) },
@@ -153,7 +151,9 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            LazyColumn {
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 80.dp) // ✅ ensures last item is fully visible
+            ) {
                 items(filteredCars) { car ->
                     CarItem(navController, car, viewModel)
                 }
@@ -161,6 +161,7 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
         }
     }
 }
+
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {

@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,10 +26,13 @@ import androidx.navigation.compose.rememberNavController
 import com.shirleen.gearup.R
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
+import com.shirleen.gearup.ui.theme.newGrey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuyerProfileScreen(navController: NavController) {
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -58,59 +62,17 @@ fun BuyerProfileScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Account Actions
-                Text("Account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(2.dp)
-                ) {
-                    Column {
-                        ProfileOptionItem(
-                            icon = Icons.Default.ShoppingCart,
-                            title = "My Orders",
-                            onClick = { /* Navigate to orders screen */ }
-                        )
-                        Divider()
-                        ProfileOptionItem(
-                            icon = Icons.Default.Build,
-                            title = "My Service Bookings",
-                            onClick = { /* Navigate to bookings screen */ }
-                        )
-                        Divider()
-                        ProfileOptionItem(
-                            icon = Icons.Default.Event,
-                            title = "My Appointments",
-                            onClick = { /* Navigate to appointments screen */ }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
 
                 // Settings
-                Text("Settings", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+                Text("Thank you for being a part of our community. Your support for the businesses on our platform means the world to us. It's your enthusiasm that helps our sellers—many of whom are small businesses—thrive.\n" +
+                        "We're so grateful to have you here and can't wait to see what you discover next!", fontSize = 25.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 60.dp), color = Color.LightGray)
+
+                Text("Thank you for choosing", fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 70.dp), color = Color.LightGray)
                 Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(2.dp)
-                ) {
-                    Column {
-                        ProfileOptionItem(
-                            icon = Icons.Default.Settings,
-                            title = "Account Settings",
-                            onClick = { /* Navigate to settings */ }
-                        )
-                        Divider()
-                        ProfileOptionItem(
-                            icon = Icons.Default.ExitToApp,
-                            title = "Logout",
-                            onClick = { /* Handle logout */ }
-                        )
-                    }
-                }
+                Text("GearUp", fontSize = 50.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 90.dp, end = 10.dp), color = Color.LightGray)
+
+
             }
         }
     )

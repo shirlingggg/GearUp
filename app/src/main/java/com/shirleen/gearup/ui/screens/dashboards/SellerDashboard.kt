@@ -23,6 +23,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.shirleen.gearup.R
+import com.shirleen.gearup.navigation.ROUT_ADD_ACCESSORY
+import com.shirleen.gearup.navigation.ROUT_ADD_CAR
 import com.shirleen.gearup.navigation.ROUT_SELLERDASHBOARD
 import com.shirleen.gearup.navigation.ROUT_SELLERPROFILESCREEN
 import com.shirleen.gearup.ui.theme.newBlue
@@ -81,23 +83,7 @@ fun SellerDashboardScreen(navController: NavController) {
                     )
                 )
 
-                // Orders Icon
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Assignment, contentDescription = "Orders") },
-                    label = { Text("Orders") },
-                    selected = currentRoute == "ROUT_SELLER_ORDERS", // Placeholder for Orders route
-                    onClick = {
-                        if (currentRoute != "ROUT_SELLER_ORDERS") {
-                            navController.navigate("ROUT_SELLER_ORDERS")
-                        }
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = newBlue,
-                        unselectedIconColor = Color.White,
-                        selectedTextColor = newBlue,
-                        unselectedTextColor = Color.White
-                    )
-                )
+
 
                 // Profile Icon
                 NavigationBarItem(
@@ -141,12 +127,12 @@ fun SellerDashboardScreen(navController: NavController) {
                         QuickActionCard(
                             title = "Sell a Car",
                             icon = Icons.Default.DirectionsCar,
-                            onClick = { navController.navigate("ROUT_ADD_CAR") }
+                            onClick = { navController.navigate(ROUT_ADD_CAR) }
                         )
                         QuickActionCard(
                             title = "Add Accessory",
                             icon = Icons.Default.ShoppingCart,
-                            onClick = { navController.navigate("ROUT_ADD_ACCESSORY") }
+                            onClick = { navController.navigate(ROUT_ADD_ACCESSORY) }
                         )
                     }
                 }

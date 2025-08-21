@@ -61,61 +61,18 @@ fun SellerProfileScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Business Management Actions
-                Text("Your Business", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(2.dp)
-                ) {
-                    Column {
-                        ProfileOptionItem(
-                            icon = Icons.Default.List,
-                            title = "My Listings",
-                            onClick = { /* Navigate to listings management screen */ }
-                        )
-                        Divider()
-                        ProfileOptionItem(
-                            icon = Icons.Default.ShoppingCart,
-                            title = "Customer Orders",
-                            onClick = { /* Navigate to orders screen */ }
-                        )
-                        Divider()
-                        ProfileOptionItem(
-                            icon = Icons.Default.Add,
-                            title = "Add New Listing",
-                            onClick = { /* Navigate to add listing screen */ }
-                        )
-                    }
-                }
+                // Settings
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Text("We are so grateful to have you as a seller! Your passion and dedication are what make our marketplace special. Thank you for being a part of our community.", fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 100.dp), color = Color.LightGray)
 
-                // Account Settings
-                Text("Account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text("Thank you for choosing", fontSize = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 100.dp), color = Color.LightGray)
                 Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(2.dp)
-                ) {
-                    Column {
-                        ProfileOptionItem(
-                            icon = Icons.Default.Settings,
-                            title = "Account Settings",
-                            onClick = { /* Navigate to settings */ }
-                        )
-                        Divider()
-                        ProfileOptionItem(
-                            icon = Icons.Default.ExitToApp,
-                            title = "Logout",
-                            onClick = { /* Handle logout */ }
-                        )
-                    }
-                }
+                Text("GearUp", fontSize = 50.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 90.dp, end = 10.dp), color = Color.LightGray)
+
             }
-        }
+
+            }
+
     )
 }
 

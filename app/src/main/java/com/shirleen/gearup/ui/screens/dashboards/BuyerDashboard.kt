@@ -1,47 +1,57 @@
 package com.shirleen.gearup.ui.screens.dashboards
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Garage
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.shirleen.gearup.navigation.ROUT_ACCESSORIES
-import com.shirleen.gearup.navigation.ROUT_BOOKAPPOINTMENT
-import com.shirleen.gearup.navigation.ROUT_BUYCAR
+import com.shirleen.gearup.navigation.ROUT_ACCESSORY_LIST
 import com.shirleen.gearup.navigation.ROUT_BUYERPROFILESCREEN
-import com.shirleen.gearup.navigation.ROUT_EXPLORE
-import com.shirleen.gearup.navigation.ROUT_SERVICES
+import com.shirleen.gearup.navigation.ROUT_CAR_LIST
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
+import com.shirleen.gearup.R
+import com.shirleen.gearup.navigation.ROUT_CART
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuyerDashboardScreen(navController: NavController) {
     var selectedIndex by remember { mutableStateOf(0) }
+
+    // Sample data - Replace with your actual data fetching logic
+    val featuredCars = remember {
+        listOf("Toyota Camry 2023", "Honda Civic Sport", "Ford Mustang GT", "BMW X5")
+    }
 
     val navBarColors = NavigationBarItemDefaults.colors(
         selectedIconColor = newBlue,
@@ -51,6 +61,23 @@ fun BuyerDashboardScreen(navController: NavController) {
     )
 
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "GearUp",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = newBluu
+                ),
+                actions = {
+                    // This space intentionally left blank as per the user request to remove notifications icon
+                }
+            )
+        },
         bottomBar = {
             NavigationBar(
                 containerColor = newBluu
@@ -63,69 +90,92 @@ fun BuyerDashboardScreen(navController: NavController) {
                     colors = navBarColors
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Explore, contentDescription = "Explore") },
-                    label = { Text("Explore") },
+                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
+                    label = { Text("Cart") },
                     selected = selectedIndex == 1,
-                    onClick = { navController.navigate(ROUT_EXPLORE) },
+                    onClick = {
+                        navController.navigate(ROUT_CART)
+                    },
                     colors = navBarColors
                 )
-
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
                     label = { Text("Profile") },
-                    selected = selectedIndex == 3,
+                    selected = selectedIndex == 2,
                     onClick = { navController.navigate(ROUT_BUYERPROFILESCREEN) },
                     colors = navBarColors
                 )
             }
         },
-
         content = { paddingValues ->
             LazyColumn(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
+                    .background(Color(0xFFF8F9FA))
             ) {
-                // Hero Section
+                // Header with greeting
                 item {
-                    Text(
-                        text = "Welcome to GearUp",
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp).padding(top = 20.dp),
-                        color = newBlue
-                    )
-                    Text(
-                        "Your one-stop hub for cars, services & accessories!",
-                        fontSize = 17.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(start = 20.dp, bottom = 20.dp)
-                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(newBluu, newBlue)
+                                )
+                            )
+                            .padding(20.dp)
+                    ) {
+                        Text(
+                            text = "Welcome!",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Find your perfect car and accessories",
+                            fontSize = 16.sp,
+                            color = Color.White.copy(alpha = 0.9f),
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+
+
+
+
+                    }
                 }
 
                 // Quick Actions
                 item {
+                    Text(
+                        "Quick Actions",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                        color = Color.Black
+                    )
+                }
+                item {
                     Row(
                         modifier = Modifier
-                            .padding(horizontal = 20.dp)
+                            .padding(horizontal = 16.dp)
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        // Corrected the QuickAction list to use the QuickAction data class for all items.
-                        // A placeholder route "" is used for actions without a specific navigation target.
                         val quickActions = listOf(
-                            QuickAction("Buy a Car", Icons.Default.DirectionsCar, newBlue, ROUT_BUYCAR),
-                            QuickAction("Services", Icons.Default.Build, newBlue, ROUT_SERVICES),
-                            QuickAction("Accessories", Icons.Default.ShoppingCart, newBlue, ROUT_ACCESSORIES),
-                            QuickAction("Book", Icons.Default.Event, newBlue, ROUT_BOOKAPPOINTMENT)
+                            QuickAction("Buy a Car", Icons.Default.DirectionsCar, newBlue,
+                                ROUT_CAR_LIST
+                            ),
+                            QuickAction("Accessories", Icons.Default.ShoppingCart, newBlue,
+                                ROUT_ACCESSORY_LIST
+                            )
                         )
-                        // Destructuring is now correct as all items are of the same type.
+
                         quickActions.forEach { (title, icon, color, route) ->
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .width(70.dp)
-                                    // Use navController to navigate when a route is defined.
+                                    .width(120.dp) // Adjusted width for two items
                                     .clickable {
                                         if (route.isNotEmpty()) {
                                             navController.navigate(route)
@@ -134,116 +184,131 @@ fun BuyerDashboardScreen(navController: NavController) {
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(50.dp)
-                                        .background(color.copy(alpha = 0.1f), CircleShape),
+                                        .size(60.dp)
+                                        .shadow(4.dp, CircleShape)
+                                        .background(Color.White, CircleShape)
+                                        .clip(CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(icon, contentDescription = title, tint = color)
+                                    Icon(
+                                        icon,
+                                        contentDescription = title,
+                                        tint = color,
+                                        modifier = Modifier.size(28.dp)
+                                    )
                                 }
-                                Text(title, fontSize = 12.sp, textAlign = TextAlign.Center)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    title,
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
 
-                // Featured Cars
+                // Featured Cars Section
                 item {
-                    Text(
-                        "Featured Cars",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Featured Cars",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                        Text(
+                            "View All",
+                            fontSize = 14.sp,
+                            color = newBlue,
+                            modifier = Modifier.clickable {navController.navigate(ROUT_CAR_LIST)}
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
                 item {
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        val sampleCars = listOf("Car Model A", "Car Model B", "Car Model C")
-                        items(sampleCars) { car ->
-                            Card(
-                                modifier = Modifier
-                                    .width(200.dp)
-                                    .padding(end = 10.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                elevation = CardDefaults.cardElevation(4.dp)
-                            ) {
-                                Column {
-                                    Box(
-                                        modifier = Modifier
-                                            .height(120.dp)
-                                            .fillMaxWidth()
-                                            .background(Color.LightGray),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text("Image", color = Color.DarkGray)
-                                    }
-                                    Text(
-                                        car,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(8.dp)
-                                    )
-                                    Text(
-                                        "$25,000",
-                                        color = newBlue,
-                                        modifier = Modifier.padding(horizontal = 8.dp)
-                                    )
-                                }
-                            }
+                        items(featuredCars) { car ->
+                            FeaturedCarCard(carName = car)
                         }
                     }
-                }
-
-                // Recommended for You
-                item {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(
-                        "Recommended for You",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 20.dp)
-                    )
-                }
-                items(3) { index ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 8.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = CardDefaults.cardElevation(2.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .background(Color.LightGray),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("Img")
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text("Service or Car ${index + 1}", fontWeight = FontWeight.Bold)
-                                Text("Brief description...", fontSize = 12.sp, color = Color.Gray)
-                            }
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
-
     )
 }
 
-// Data class is already correct
-data class QuickAction(val title: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val color: Color, val route: String )
+@Composable
+fun FeaturedCarCard(carName: String) {
+    Card(
+        modifier = Modifier
+            .width(280.dp)
+            .height(200.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Car image placeholder
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(newBlue.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(painter = painterResource(R.drawable.corolla),
+                    contentDescription = "Car",
+                    modifier = Modifier.fillMaxSize())
+            }
 
+
+
+            // Car info
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .padding(12.dp)
+            ) {
+                Text(
+                    carName,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    "Ksh3,200,000",
+                    fontSize = 14.sp,
+                    color = newBlue,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+
+
+data class QuickAction(
+    val title: String,
+    val icon: ImageVector,
+    val color: Color,
+    val route: String
+)
 
 @Preview(showBackground = true)
 @Composable

@@ -37,12 +37,21 @@ val navy = Color(0xFF003366)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SplashScreen(navController: NavController) {
-    val coroutine = rememberCoroutineScope()
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.car))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1 // play only once
+    )
 
-    coroutine.launch {
-        delay(3000)
-        navController.navigate(ROUT_LOGIN)
+    // Navigate only when animation finishes
+    LaunchedEffect(progress) {
+        if (progress >= 0.95f) { // not waiting for exact end
+            navController.navigate(ROUT_LOGIN) {
+                popUpTo(0)
+            }
+        }
     }
+
 
     Column(
         modifier = Modifier.fillMaxSize()
