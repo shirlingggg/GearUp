@@ -13,20 +13,17 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shirleen.gearup.data.AccessoryDatabase
-
 import com.shirleen.gearup.data.UserDatabase
 import com.shirleen.gearup.repository.UserRepository
 import com.shirleen.gearup.ui.screens.dashboards.BuyerDashboardScreen
 import com.shirleen.gearup.ui.screens.about.AboutScreen
-import com.shirleen.gearup.ui.screens.accessories.AccessoriesScreen
 import com.shirleen.gearup.ui.screens.home.HomeScreen
 import com.shirleen.gearup.ui.screens.splash.SplashScreen
 import com.shirleen.gearup.viewmodel.AuthViewModel
-
 import com.shirleen.gearup.ui.screens.auth.LoginScreen
 import com.shirleen.gearup.ui.screens.auth.RegisterScreen
 import com.shirleen.gearup.ui.screens.bookappointment.BookAppointmentScreen
-import com.shirleen.gearup.ui.screens.buycar.BuyCarScreen
+import com.shirleen.gearup.ui.screens.buyitems.BuyCarScreen
 import com.shirleen.gearup.ui.screens.cars.AddCarScreen
 import com.shirleen.gearup.ui.screens.cars.CarListScreen
 import com.shirleen.gearup.ui.screens.cars.EditCarScreen
@@ -34,22 +31,26 @@ import com.shirleen.gearup.ui.screens.profilescreens.BuyerProfileScreen
 import com.shirleen.gearup.ui.screens.dashboards.SellerDashboardScreen
 import com.shirleen.gearup.ui.screens.dashboards.ServiceProviderDashboardScreen
 import com.shirleen.gearup.ui.screens.profilescreens.ServiceProviderProfileScreen
-import com.shirleen.gearup.ui.screens.explore.ExploreScreen
 import com.shirleen.gearup.ui.screens.profilescreens.SellerProfileScreen
 import com.shirleen.gearup.ui.screens.services.ServicesScreen
 import com.shirleen.gearup.viewmodel.CarViewModel
 import com.shirleen.gearup.viewmodel.CarViewModelFactory
-import com.shirleen.gearup.repository.CarRepository // Corrected: Import CarRepository
-import com.shirleen.gearup.data.CarDatabase // Corrected: Import CarDatabase
+import com.shirleen.gearup.repository.CarRepository
+import com.shirleen.gearup.data.CarDatabase
 import com.shirleen.gearup.repository.AccessoryRepository
 import com.shirleen.gearup.ui.screens.accessory.AccessoryListScreen
 import com.shirleen.gearup.ui.screens.accessory.AddAccessoryScreen
 import com.shirleen.gearup.ui.screens.accessory.EditAccessoryScreen
+import com.shirleen.gearup.ui.screens.buyitems.BuyAccessoriesScreen
 import com.shirleen.gearup.ui.screens.cart.CartScreen
 import com.shirleen.gearup.ui.screens.checkout.CheckOutScreen
 import com.shirleen.gearup.ui.screens.checkout.PaymentSuccessScreen
 import com.shirleen.gearup.viewmodel.AccessoryViewModel
 import com.shirleen.gearup.viewmodel.AccessoryViewModelFactory
+import com.shirleen.gearup.viewmodel.CartViewModel
+import com.shirleen.gearup.data.CartDatabase
+import com.shirleen.gearup.repository.CartRepository
+import com.shirleen.gearup.viewmodel.CartViewModelFactory
 
 @Composable
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -66,18 +67,20 @@ fun AppNavHost(
     val authRepository = UserRepository(appDatabase.userDao())
     val authViewModel: AuthViewModel = viewModel { AuthViewModel(authRepository) }
 
-    // Corrected: Initializing CarViewModel without AppContainer
     val carDatabase = CarDatabase.getDatabase(context)
     val carRepository = CarRepository(carDatabase.carDao())
     val carViewModel: CarViewModel = viewModel { CarViewModelFactory(carRepository).create(CarViewModel::class.java) }
 
-    // Create the ViewModel instance outside the NavHost
     val accessoryViewModel: AccessoryViewModel = viewModel(
         factory = AccessoryViewModelFactory(
             AccessoryRepository(AccessoryDatabase.getDatabase(context).accessoryDao())
         )
     )
 
+    // Corrected: Instantiate CartViewModel with its dependencies
+    val cartDatabase = CartDatabase.getDatabase(context)
+    val cartRepository = CartRepository(cartDatabase.cartDao())
+    val cartViewModel: CartViewModel = viewModel { CartViewModelFactory(cartRepository).create(CartViewModel::class.java) }
 
     NavHost(
         navController = navController,
@@ -100,23 +103,15 @@ fun AppNavHost(
         }
 
         composable(ROUT_BUYCAR) {
-            BuyCarScreen(navController)
+            BuyCarScreen(navController, carViewModel, cartViewModel)
         }
 
         composable(ROUT_SERVICES) {
             ServicesScreen(navController)
         }
 
-        composable(ROUT_ACCESSORIES) {
-            AccessoriesScreen(navController)
-        }
-
         composable(ROUT_BOOKAPPOINTMENT) {
             BookAppointmentScreen(navController)
-        }
-
-        composable(ROUT_EXPLORE) {
-            ExploreScreen(navController)
         }
 
         composable(ROUT_SELLERDASHBOARD) {
@@ -139,8 +134,9 @@ fun AppNavHost(
             ServiceProviderDashboardScreen(navController)
         }
 
+        // Corrected: Pass the cartViewModel instance
         composable(ROUT_CART) {
-            CartScreen(navController)
+            CartScreen(navController, viewModel = cartViewModel)
         }
 
         composable(ROUT_PAYMENT) {
@@ -151,9 +147,11 @@ fun AppNavHost(
             CheckOutScreen(navController = navController)
         }
 
+        composable(ROUT_BUYACCESSORY) {
+            BuyAccessoriesScreen(accessoryViewModel, navController, cartViewModel = cartViewModel)
+        }
 
         //AUTHENTICATION
-
         composable(ROUT_REGISTER) {
             RegisterScreen(authViewModel, navController) {
                 navController.navigate(ROUT_LOGIN) {
@@ -206,9 +204,5 @@ fun AppNavHost(
             val accessoryId = backStackEntry.arguments?.getInt("accessoryId")
             EditAccessoryScreen(accessoryId, navController, accessoryViewModel)
         }
-
-
-
-
     }
 }

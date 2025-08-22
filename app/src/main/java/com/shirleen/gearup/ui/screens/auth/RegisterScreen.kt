@@ -33,11 +33,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.shirleen.gearup.R
+import com.shirleen.gearup.data.UserPreferences
 import com.shirleen.gearup.navigation.ROUT_LOGIN
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
 import com.shirleen.gearup.model.User
 import com.shirleen.gearup.viewmodel.AuthViewModel
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +57,7 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var role by remember { mutableStateOf("Buyer") }
     val roleOptions = listOf("Buyer", "Seller")
     var expanded by remember { mutableStateOf(false) }
@@ -370,6 +375,10 @@ fun RegisterScreen(
                 // Register button
                 Button(
                     onClick = {
+                        coroutineScope.launch {
+                            UserPreferences.saveUserRole(context, role) // "Buyer" or "Seller"
+                        }
+
                         when {
                             username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() ->
                                 Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()

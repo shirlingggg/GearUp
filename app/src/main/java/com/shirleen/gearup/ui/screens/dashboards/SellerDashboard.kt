@@ -41,7 +41,9 @@ fun SellerDashboardScreen(navController: NavController) {
     val myListings = listOf(
         SellerListing("Toyota Corolla", "KSh 1,200,000", R.drawable.corolla, true),
         SellerListing("LED Headlights", "KSh 8,500", R.drawable.ledlights, false),
-        SellerListing("Nissan X-Trail", "KSh 2,400,000", R.drawable.xtrail, true)
+        SellerListing("Nissan X-Trail", "KSh 2,400,000", R.drawable.xtrail, true),
+        SellerListing("Floor Mats", "KSh 5,000", R.drawable.floormats, false),
+        SellerListing("Car Charger", "KSh 1,500", R.drawable.carcharger, false)
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -84,24 +86,6 @@ fun SellerDashboardScreen(navController: NavController) {
                 )
 
 
-
-                // Profile Icon
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
-                    selected = currentRoute == ROUT_SELLERPROFILESCREEN,
-                    onClick = {
-                        if (currentRoute != ROUT_SELLERPROFILESCREEN) {
-                            navController.navigate(ROUT_SELLERPROFILESCREEN)
-                        }
-                    },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = newBlue,
-                        unselectedIconColor = Color.White,
-                        selectedTextColor = newBlue,
-                        unselectedTextColor = Color.White
-                    )
-                )
             }
         },
         content = { paddingValues ->
@@ -194,15 +178,14 @@ fun ListingCard(listing: SellerListing) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { /* Navigate to edit listing screen */ }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Placeholder image
+            // Use the image resource ID from the listing data
             Image(
-                painter = painterResource(R.drawable.corolla),
+                painter = painterResource(id = listing.imageRes),
                 contentDescription = listing.name,
                 modifier = Modifier
                     .size(80.dp)
@@ -217,9 +200,7 @@ fun ListingCard(listing: SellerListing) {
                     fontWeight = FontWeight.Bold
                 )
             }
-            IconButton(onClick = { /* Delete listing */ }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Gray)
-            }
+
         }
     }
 }

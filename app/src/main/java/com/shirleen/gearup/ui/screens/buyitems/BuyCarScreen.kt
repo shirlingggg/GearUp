@@ -1,11 +1,10 @@
-package com.shirleen.gearup.ui.screens.cars
+package com.shirleen.gearup.ui.screens.buyitems
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,23 +25,25 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.shirleen.gearup.model.Car
-import com.shirleen.gearup.navigation.ROUT_ADD_CAR
-import com.shirleen.gearup.navigation.ROUT_CAR_LIST
-import com.shirleen.gearup.navigation.editCarRoute
+import com.shirleen.gearup.model.CartItem
 import com.shirleen.gearup.viewmodel.CarViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
-import com.shirleen.gearup.navigation.ROUT_SELLERDASHBOARD
+import com.shirleen.gearup.navigation.ROUT_CART
 import com.shirleen.gearup.ui.theme.newBluu
+import com.shirleen.gearup.viewmodel.CartViewModel // Import the CartViewModel
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
+fun BuyCarScreen(
+    navController: NavController,
+    viewModel: CarViewModel,
+    cartViewModel: CartViewModel // Add cartViewModel as a parameter
+) {
     val carList by viewModel.cars.collectAsState()
-    var showMenu by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredCars = carList.filter {
@@ -59,28 +60,19 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                         containerColor = newBluu,
                         titleContentColor = Color.White
                     ),
-                    actions = {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu", tint = Color.White)
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = Color.White
+                            )
                         }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Dashboard") },
-                                onClick = {
-                                    navController.navigate(ROUT_SELLERDASHBOARD)
-                                    showMenu = false
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Add Car") },
-                                onClick = {
-                                    navController.navigate(ROUT_ADD_CAR)
-                                    showMenu = false
-                                }
-                            )
+                    },
+                    actions = {
+                        // Cart Button
+                        IconButton(onClick = { navController.navigate(ROUT_CART) }) {
+                            Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart", tint = Color.White)
                         }
                     }
                 )
@@ -93,7 +85,6 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                     shape = RoundedCornerShape(16.dp),
                     color = Color.White,
                 ) {
-                    //Search Bar
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -119,7 +110,6 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                //OOPS
                 if (filteredCars.isEmpty()) {
                     Text(
                         text = "Oops! We don't have that.",
@@ -130,7 +120,6 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                 }
             }
         },
-        bottomBar = { BottomNavigationBar1(navController) },
         containerColor = Color.LightGray
     ) { paddingValues ->
         Column(
@@ -140,10 +129,10 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
                 .padding(16.dp)
         ) {
             LazyColumn(
-                contentPadding = PaddingValues(bottom = 80.dp) // ✅ ensures last item is fully visible
+                contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 items(filteredCars) { car ->
-                    CarItem(navController, car, viewModel)
+                    BuyCarItem(navController, car, viewModel, cartViewModel) // Pass the cartViewModel
                 }
             }
         }
@@ -152,7 +141,12 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
+fun BuyCarItem(
+    navController: NavController,
+    car: Car,
+    viewModel: CarViewModel,
+    cartViewModel: CartViewModel // Add cartViewModel as a parameter
+) {
     val painter: Painter = rememberAsyncImagePainter(
         model = car.imageUri?.let { Uri.parse(it) } ?: Uri.EMPTY
     )
@@ -161,18 +155,12 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable {
-                if (car.id != 0) {
-                    navController.navigate(editCarRoute(car.id))
-                }
-            },
+            .padding(vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Product Image
             Image(
                 painter = painter,
                 contentDescription = "Car Image",
@@ -182,32 +170,27 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                 contentScale = ContentScale.Crop
             )
 
-            // Car Info and Buttons
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp)
             ) {
-                // Car Details
                 Text(
                     text = "Brand: ${car.brand}",
                     fontSize = 17.sp,
                     color = Color.DarkGray
                 )
-
                 Text(
                     text = "Model: ${car.model}",
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
-
                 Text(
                     text = "Year: ${car.yearOfManufacture}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color.DarkGray
                 )
-
                 Text(
                     text = "Mileage: ${car.mileage}",
                     fontSize = 16.sp,
@@ -222,12 +205,10 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Buttons (Message, Edit, Delete)
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Message Seller
                     Button(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
@@ -250,66 +231,30 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                             Text(text = "Message Seller")
                         }
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // Edit Car
+                    // Add to Cart
+                    Text(text = "Add To cart", modifier = Modifier.padding(top = 17.dp))
                     IconButton(
                         onClick = {
-                            navController.navigate(editCarRoute(car.id))
+                            val cartItem = CartItem(
+                                itemId = car.id,
+                                name = "${car.brand} ${car.model}",
+                                price = car.price,
+                                imageUrl = car.imageUri
+                            )
+                            cartViewModel.insertItem(cartItem)
+                            navController.navigate(ROUT_CART)
                         }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Add to Cart",
                             tint = newBluu
-                        )
-                    }
-
-                    // Delete Car
-                    IconButton(
-                        onClick = { viewModel.deleteCar(car) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red
                         )
                     }
                 }
             }
         }
-    }
-}
-
-// Bottom Navigation Bar Component
-@Composable
-fun BottomNavigationBar1(navController: NavController) {
-    NavigationBar(
-        containerColor = newBluu,
-        contentColor = Color.White
-    ) {
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_CAR_LIST) },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Car List") },
-            label = { Text("Home") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.White,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.White
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = { navController.navigate(ROUT_ADD_CAR) },
-            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Car") },
-            label = { Text("Add") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White,
-                unselectedIconColor = Color.White,
-                selectedTextColor = Color.White,
-                unselectedTextColor = Color.White
-            )
-        )
     }
 }

@@ -6,12 +6,15 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "cars")
 data class Car(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    override val id: Int = 0,
     val brand: String,
     val model: String,
     val yearOfManufacture: String,
     val mileage: String,
-    val price: String,
+    override val price: String,
     val phone: String,
-    val imageUri: String,
-)
+    override val imageUri: String,
+): CartEligibleItem {
+    override val name: String
+        get() = "$brand $model"
+}

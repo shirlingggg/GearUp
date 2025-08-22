@@ -12,10 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,22 +32,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.shirleen.gearup.navigation.ROUT_ACCESSORY_LIST
 import com.shirleen.gearup.navigation.ROUT_BUYERPROFILESCREEN
 import com.shirleen.gearup.navigation.ROUT_CAR_LIST
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
 import com.shirleen.gearup.R
+import com.shirleen.gearup.navigation.ROUT_BUYACCESSORY
+import com.shirleen.gearup.navigation.ROUT_BUYCAR
 import com.shirleen.gearup.navigation.ROUT_CART
+import androidx.compose.ui.layout.ContentScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuyerDashboardScreen(navController: NavController) {
     var selectedIndex by remember { mutableStateOf(0) }
 
-    // Sample data - Replace with your actual data fetching logic
+    // Sample data for Featured Cars - Use a data class
     val featuredCars = remember {
-        listOf("Toyota Camry 2023", "Honda Civic Sport", "Ford Mustang GT", "BMW X5")
+        listOf(
+            FeaturedItem("Toyota Corolla 2023", R.drawable.corolla, "Ksh3,200,000"),
+            FeaturedItem("Honda Civic Sport", R.drawable.hondacivic, "Ksh2,500,000"),
+            FeaturedItem("Ford Mustang GT", R.drawable.mustanggt, "Ksh6,000,000"),
+            FeaturedItem("BMW X5", R.drawable.bmwx5, "Ksh8,500,000")
+        )
+    }
+
+    // Sample data for Featured Accessories - Use the same data class
+    val featuredAccessories = remember {
+        listOf(
+            FeaturedItem("Car Charger", R.drawable.carcharger, "Ksh1,500"),
+            FeaturedItem("Floor Mats", R.drawable.floormats, "Ksh5,000"),
+            FeaturedItem("Car Seat Cover", R.drawable.leathercover, "Ksh10,000"),
+            FeaturedItem("Phone Mount", R.drawable.phonemount, "Ksh1,200")
+        )
     }
 
     val navBarColors = NavigationBarItemDefaults.colors(
@@ -67,7 +81,8 @@ fun BuyerDashboardScreen(navController: NavController) {
                     Text(
                         "GearUp",
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.White,
+                        fontSize = 40.sp
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -98,13 +113,7 @@ fun BuyerDashboardScreen(navController: NavController) {
                     },
                     colors = navBarColors
                 )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
-                    label = { Text("Profile") },
-                    selected = selectedIndex == 2,
-                    onClick = { navController.navigate(ROUT_BUYERPROFILESCREEN) },
-                    colors = navBarColors
-                )
+
             }
         },
         content = { paddingValues ->
@@ -138,10 +147,6 @@ fun BuyerDashboardScreen(navController: NavController) {
                             color = Color.White.copy(alpha = 0.9f),
                             modifier = Modifier.padding(top = 4.dp)
                         )
-
-
-
-
                     }
                 }
 
@@ -164,10 +169,10 @@ fun BuyerDashboardScreen(navController: NavController) {
                     ) {
                         val quickActions = listOf(
                             QuickAction("Buy a Car", Icons.Default.DirectionsCar, newBlue,
-                                ROUT_CAR_LIST
+                                ROUT_BUYCAR
                             ),
                             QuickAction("Accessories", Icons.Default.ShoppingCart, newBlue,
-                                ROUT_ACCESSORY_LIST
+                                ROUT_BUYACCESSORY
                             )
                         )
 
@@ -242,7 +247,42 @@ fun BuyerDashboardScreen(navController: NavController) {
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(featuredCars) { car ->
-                            FeaturedCarCard(carName = car)
+                            FeaturedItemCard(item = car)
+                        }
+                    }
+                }
+
+                // Featured Accessories Section
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Featured Accessories",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                        Text(
+                            "View All",
+                            fontSize = 14.sp,
+                            color = newBlue,
+                            modifier = Modifier.clickable { navController.navigate(ROUT_BUYACCESSORY) }
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(featuredAccessories) { accessory ->
+                            FeaturedItemCard(item = accessory)
                         }
                     }
                     Spacer(modifier = Modifier.height(80.dp))
@@ -253,7 +293,7 @@ fun BuyerDashboardScreen(navController: NavController) {
 }
 
 @Composable
-fun FeaturedCarCard(carName: String) {
+fun FeaturedItemCard(item: FeaturedItem) {
     Card(
         modifier = Modifier
             .width(280.dp)
@@ -262,21 +302,14 @@ fun FeaturedCarCard(carName: String) {
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Car image placeholder
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(newBlue.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(painter = painterResource(R.drawable.corolla),
-                    contentDescription = "Car",
-                    modifier = Modifier.fillMaxSize())
-            }
+            Image(
+                painter = painterResource(id = item.imageResId),
+                contentDescription = item.name,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
-
-
-            // Car info
+            // Item info
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -285,13 +318,13 @@ fun FeaturedCarCard(carName: String) {
                     .padding(12.dp)
             ) {
                 Text(
-                    carName,
+                    item.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
                 Text(
-                    "Ksh3,200,000",
+                    item.price,
                     fontSize = 14.sp,
                     color = newBlue,
                     modifier = Modifier.padding(top = 4.dp)
@@ -301,7 +334,11 @@ fun FeaturedCarCard(carName: String) {
     }
 }
 
-
+data class FeaturedItem(
+    val name: String,
+    val imageResId: Int,
+    val price: String
+)
 
 data class QuickAction(
     val title: String,

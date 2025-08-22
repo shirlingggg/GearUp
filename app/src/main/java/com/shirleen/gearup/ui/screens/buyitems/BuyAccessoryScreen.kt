@@ -1,24 +1,18 @@
-package com.shirleen.gearup.ui.screens.accessory
+package com.shirleen.gearup.ui.screens.buyitems
 
-import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.pdf.PdfDocument
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,41 +20,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.shirleen.gearup.model.Accessory
-import com.shirleen.gearup.navigation.ROUT_ADD_ACCESSORY
-import com.shirleen.gearup.navigation.ROUT_ACCESSORY_LIST
-import com.shirleen.gearup.navigation.editAccessoryRoute
-import com.shirleen.gearup.viewmodel.AccessoryViewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.style.TextAlign
-import com.shirleen.gearup.data.UserPreferences
-import com.shirleen.gearup.navigation.ROUT_SELLERDASHBOARD
+import com.shirleen.gearup.model.CartItem
+import com.shirleen.gearup.navigation.ROUT_CART
 import com.shirleen.gearup.ui.theme.newBluu
-import com.shirleen.gearup.viewmodel.AuthViewModel
-import java.io.IOException
-import java.io.OutputStream
+import com.shirleen.gearup.viewmodel.AccessoryViewModel
+import com.shirleen.gearup.viewmodel.CartViewModel // Import the CartViewModel
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccessoryListScreen(
-    navController: NavController,
+fun BuyAccessoriesScreen(
     viewModel: AccessoryViewModel,
-
+    navController: NavController,
+    cartViewModel: CartViewModel // Add the cartViewModel as a parameter
 ) {
     val allAccessories by viewModel.allAccessories.collectAsState(initial = emptyList())
-    var showMenu by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
-    val context = LocalContext.current
 
     val filteredAccessories = allAccessories.filter {
         it.name.contains(searchQuery, ignoreCase = true)
@@ -75,45 +57,29 @@ fun AccessoryListScreen(
                         containerColor = newBluu,
                         titleContentColor = Color.White
                     ),
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back",
+                                tint = Color.White
+                            )
+                        }
+                    },
                     actions = {
-
-
-                        IconButton(onClick = { showMenu = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = "Menu",
-                                    tint = Color.White
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = showMenu,
-                                onDismissRequest = { showMenu = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Dashboard") },
-                                    onClick = {
-                                        navController.navigate(ROUT_SELLERDASHBOARD)
-                                        showMenu = false
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Add Accessory") },
-                                    onClick = {
-                                        navController.navigate(ROUT_ADD_ACCESSORY)
-                                        showMenu = false
-                                    }
-                                )
-                            }
-
+                        // Cart Button
+                        IconButton(onClick = { navController.navigate(ROUT_CART) }) {
+                            Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart", tint = Color.White)
+                        }
                     }
+
                 )
 
                 //Search Bar
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 10.dp, end = 10.dp)
-                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+                        .padding(top = 16.dp, start = 10.dp, end = 10.dp),
                     shape = RoundedCornerShape(16.dp),
                     color = Color.White,
                 ) {
@@ -123,7 +89,7 @@ fun AccessoryListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp, vertical = 8.dp),
-                        placeholder = { Text("Search cars...") },
+                        placeholder = { Text("Search accessories...") },
                         singleLine = true,
                         leadingIcon = {
                             Icon(
@@ -145,7 +111,9 @@ fun AccessoryListScreen(
                 if (filteredAccessories.isEmpty()) {
                     Text(
                         text = "Oops! We don't have that.",
-                        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(Alignment.Center),
                         textAlign = TextAlign.Center,
                         color = Color.Gray
                     )
@@ -154,45 +122,10 @@ fun AccessoryListScreen(
                         contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
                         items(filteredAccessories) { accessory ->
-                            AccessoryItem(navController, accessory, viewModel)
+                            BuyerAccessoryItem(navController, accessory, cartViewModel) // Pass cartViewModel here
                         }
                     }
                 }
-            }
-        },
-
-        bottomBar = {
-            NavigationBar(
-                containerColor = newBluu,
-                contentColor = Color.White
-            ) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate(ROUT_ACCESSORY_LIST) },
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Accessory List") },
-                    label = { Text("Home") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color.White,
-                        unselectedIconColor = Color.White,
-                        selectedTextColor = Color.White,
-                        unselectedTextColor = Color.White
-                    )
-                )
-
-
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate(ROUT_ADD_ACCESSORY) },
-                        icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Accessory") },
-                        label = { Text("Add") },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Color.White,
-                            unselectedIconColor = Color.White,
-                            selectedTextColor = Color.White,
-                            unselectedTextColor = Color.White
-                        )
-                    )
-
             }
         },
         containerColor = Color.LightGray
@@ -209,14 +142,14 @@ fun AccessoryListScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "No accessories found. Click '+' to add one.")
+                    Text(text = "No accessories found.")
                 }
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     items(filteredAccessories) { accessory ->
-                        AccessoryItem(navController, accessory, viewModel)
+                        BuyerAccessoryItem(navController, accessory, cartViewModel) // Pass cartViewModel here
                     }
                 }
             }
@@ -224,27 +157,19 @@ fun AccessoryListScreen(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun AccessoryItem(
+fun BuyerAccessoryItem(
     navController: NavController,
     accessory: Accessory,
-    viewModel: AccessoryViewModel,
+    cartViewModel: CartViewModel // Add cartViewModel as a parameter
 ) {
-    val painter: Painter = rememberAsyncImagePainter(
-        model = accessory.imageUri?.let { Uri.parse(it) } ?: Uri.EMPTY
-    )
+    val painter = rememberAsyncImagePainter(model = accessory.imageUri)
     val context = LocalContext.current
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable {
-                if (accessory.id != 0) {
-                    navController.navigate(editAccessoryRoute(accessory.id))
-                }
-            },
+            .padding(vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
@@ -275,14 +200,14 @@ fun AccessoryItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Message Seller (visible to both)
+                    // Message Seller (buyers only)
                     Button(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
                             smsIntent.data = "smsto:${accessory.phone}".toUri()
                             smsIntent.putExtra(
                                 "sms_body",
-                                "Hello, I'm inerested in ${accessory.name}, could you tell me more about it..."
+                                "Hello, I'm interested in ${accessory.name}, could you tell me more about it..."
                             )
                             context.startActivity(smsIntent)
                         },
@@ -301,32 +226,30 @@ fun AccessoryItem(
                             Text(text = "Message Seller")
                         }
                     }
+                    Spacer(modifier = Modifier.height(10.dp))
 
-
-                    // Edit Accessory
+                    // Add to Cart
+                    Text(text = "Add To cart", modifier = Modifier.padding(top = 17.dp))
                     IconButton(
-                        onClick = { navController.navigate(editAccessoryRoute(accessory.id)) }
+                        onClick = {
+                            val cartItem = CartItem(
+                                itemId = accessory.id,
+                                name = accessory.name,
+                                price = accessory.price,
+                                imageUrl = accessory.imageUri
+                            )
+                            cartViewModel.insertItem(cartItem)
+                            navController.navigate(ROUT_CART)
+                        }
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Shopping cart",
                             tint = newBluu
                         )
                     }
-
-                    // Delete Accessory
-                    IconButton(
-                        onClick = { viewModel.deleteAccessory(accessory) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red
-                        )
-                    }
-                }
                 }
             }
         }
     }
-
+}

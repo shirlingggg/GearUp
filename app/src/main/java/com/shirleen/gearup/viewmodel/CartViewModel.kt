@@ -1,64 +1,26 @@
 package com.shirleen.gearup.viewmodel
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.shirleen.gearup.repository.CartRepository
 import com.shirleen.gearup.model.CartItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
-/**
- * ViewModel for the CartScreen.
- * This simplified ViewModel holds the state of the cart directly
- * and provides methods to modify it without a database or repository.
- */
-class CartViewModel : ViewModel() {
+class CartViewModel(private val repository: CartRepository) : ViewModel() {
 
-    // The list of cart items. It is observable,
-    // so the UI will automatically update when it changes.
-    private val _cartItems = mutableStateListOf<CartItem>()
-    val cartItems: List<CartItem> get() = _cartItems
+    val allItems: Flow<List<CartItem>> = repository.allItems
+    val subtotal: Flow<Double?> = repository.subtotal
 
-    // The subtotal of all items in the cart.
-    // We'll calculate this directly from the list.
-    private var _subtotal: Double = 0.0
-    val subtotal: Double get() = _subtotal
-
-    init {
-        // Dummy data for initial demonstration.
-        _cartItems.addAll(
-            listOf(
-                CartItem(1, "Ford", "Mustang GT", "Ksh 1,999,000"),
-                CartItem(2, "Brembo", "Brake Pads", "Ksh 2,000"),
-                CartItem(3, "Honda", "Civic Sport", "Ksh 2,800,000")
-            )
-        )
-        updateSubtotal()
-    }
-
-    /**
-     * Adds an item to the cart.
-     * @param item The CartItem to be added.
-     */
-    fun addItem(item: CartItem) {
-        _cartItems.add(item)
-        updateSubtotal()
-    }
-
-    /**
-     * Removes an item from the cart.
-     * @param item The CartItem to be removed.
-     */
-    fun removeItem(item: CartItem) {
-        _cartItems.remove(item)
-        updateSubtotal()
-    }
-
-    /**
-     * Calculates the subtotal by parsing the price strings and summing them.
-     */
-    private fun updateSubtotal() {
-        val sum = _cartItems.sumOf {
-            // Remove "$" and "," from the string and convert to Double.
-            it.price.replace("Ksh", "").replace(",", "").toDoubleOrNull() ?: 0.0
+    fun insertItem(item: CartItem) {
+        viewModelScope.launch {
+            repository.insertItem(item)
         }
-        _subtotal = sum
+    }
+
+    fun deleteItem(item: CartItem) {
+        viewModelScope.launch {
+            repository.deleteItem(item)
+        }
     }
 }

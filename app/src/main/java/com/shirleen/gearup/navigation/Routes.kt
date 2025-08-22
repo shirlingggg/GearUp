@@ -3,9 +3,7 @@ package com.shirleen.gearup.navigation
 const val ROUT_BUYERDASHBOARD = "buyerdashboard"
 const val ROUT_BUYCAR = "buycar"
 const val ROUT_SERVICES = "services"
-const val ROUT_ACCESSORIES = "accessories"
 const val ROUT_BOOKAPPOINTMENT = "bookappointment"
-const val ROUT_EXPLORE = "explore"
 const val ROUT_SELLERDASHBOARD = "sellerdashboard"
 const val ROUT_SELLERPROFILESCREEN = "sellerprofilescreen"
 const val ROUT_SERVICEPROVIDERPROFILESCREEN = "serviceproviderprofilescreen"
@@ -17,6 +15,8 @@ const val ROUT_SPLASH = "splash"
 const val ROUT_CART = "cart"
 const val ROUT_PAYMENT = "payment"
 const val ROUT_CHECKOUT = "checkout"
+
+const val ROUT_BUYACCESSORY = "buyaccessory"
 
 
 

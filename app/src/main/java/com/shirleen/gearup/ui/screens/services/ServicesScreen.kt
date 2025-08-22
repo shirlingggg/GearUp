@@ -13,10 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,9 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.shirleen.gearup.R
 import com.shirleen.gearup.navigation.ROUT_BOOKAPPOINTMENT
-import com.shirleen.gearup.navigation.ROUT_BUYERDASHBOARD
-import com.shirleen.gearup.ui.screens.buycar.BottomNavigationBar
-import com.shirleen.gearup.ui.screens.buycar.BottomNavItem
+import com.shirleen.gearup.ui.screens.cars.BottomNavigationBar
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
 

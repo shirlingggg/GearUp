@@ -8,6 +8,8 @@ import com.shirleen.gearup.model.Accessory
 import com.shirleen.gearup.repository.AccessoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -66,3 +68,11 @@ class AccessoryViewModelFactory(private val repository: AccessoryRepository) : V
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+private val _cartItems = MutableStateFlow<List<Accessory>>(emptyList())
+val cartItems: StateFlow<List<Accessory>> = _cartItems
+
+fun addToCart(accessory: Accessory) {
+    _cartItems.value = _cartItems.value + accessory
+}
+
