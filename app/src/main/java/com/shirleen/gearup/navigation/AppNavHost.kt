@@ -50,7 +50,6 @@ import com.shirleen.gearup.viewmodel.AccessoryViewModelFactory
 import com.shirleen.gearup.viewmodel.CartViewModel
 import com.shirleen.gearup.data.CartDatabase
 import com.shirleen.gearup.repository.CartRepository
-import com.shirleen.gearup.viewmodel.CartViewModelFactory
 
 @Composable
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -80,7 +79,10 @@ fun AppNavHost(
     // Corrected: Instantiate CartViewModel with its dependencies
     val cartDatabase = CartDatabase.getDatabase(context)
     val cartRepository = CartRepository(cartDatabase.cartDao())
-    val cartViewModel: CartViewModel = viewModel { CartViewModelFactory(cartRepository).create(CartViewModel::class.java) }
+    val cartViewModel: CartViewModel = viewModel {
+        CartViewModel.CartViewModelFactory(cartRepository).create(CartViewModel::class.java)
+    }
+
 
     NavHost(
         navController = navController,
@@ -136,7 +138,7 @@ fun AppNavHost(
 
         // Corrected: Pass the cartViewModel instance
         composable(ROUT_CART) {
-            CartScreen(navController, viewModel = cartViewModel)
+            CartScreen( navController, cartViewModel)
         }
 
         composable(ROUT_PAYMENT) {

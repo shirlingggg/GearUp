@@ -38,10 +38,8 @@ import com.shirleen.gearup.viewmodel.CarViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddCarScreen(navController: NavController, viewModel: CarViewModel) {
-    var brand by remember { mutableStateOf("") }
-    var model by remember { mutableStateOf("") }
-    var yearOfManufacture by remember { mutableStateOf("") }
-    var mileage by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
@@ -107,10 +105,10 @@ fun AddCarScreen(navController: NavController, viewModel: CarViewModel) {
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
-                    // Car Brand
+                    // Car name
                     OutlinedTextField(
-                        value = brand,
-                        onValueChange = { brand = it },
+                        value = name,
+                        onValueChange = { name = it },
                         label = { Text("Brand") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -122,10 +120,10 @@ fun AddCarScreen(navController: NavController, viewModel: CarViewModel) {
                 }
 
                 item {
-                    // Car model
+                    // Car description
                     OutlinedTextField(
-                        value = model,
-                        onValueChange = { model = it },
+                        value = description,
+                        onValueChange = { description = it },
                         label = { Text("Model") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -152,37 +150,6 @@ fun AddCarScreen(navController: NavController, viewModel: CarViewModel) {
                     )
                 }
 
-                item {
-                    // Year of manufacture
-                    OutlinedTextField(
-                        value = yearOfManufacture,
-                        onValueChange = { yearOfManufacture = it },
-                        label = { Text("Year of Manufacture") },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = newBluu,
-                            focusedLabelColor = newBluu,
-                            cursorColor = newBluu
-                        )
-                    )
-                }
-
-                item {
-                    //Mileage
-                    OutlinedTextField(
-                        value = mileage,
-                        onValueChange = { mileage = it },
-                        label = { Text("Mileage") },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = newBluu,
-                            focusedLabelColor = newBluu,
-                            cursorColor = newBluu
-                        )
-                    )
-                }
 
                 item {
                     // Phone Number
@@ -242,10 +209,8 @@ fun AddCarScreen(navController: NavController, viewModel: CarViewModel) {
                         onClick = {
                             val newCar = Car(
                                 id = 0, // Room will generate this
-                                brand = brand,
-                                model = model,
-                                yearOfManufacture = yearOfManufacture,
-                                mileage = mileage,
+                                name = name,
+                                description = description,
                                 price = price,
                                 phone = phone,
                                 imageUri = imageUri.toString()

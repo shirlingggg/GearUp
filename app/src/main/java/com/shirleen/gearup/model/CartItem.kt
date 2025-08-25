@@ -6,8 +6,14 @@ import androidx.room.PrimaryKey
 data class CartItem(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val itemId: Int,
     val name: String,
+    val description: String,
     val price: String,
-    val imageUrl: String?
-)
+    val phone: String,
+    val imageUri: String,
+    var quantity: Int = 1
+) {
+    fun totalPrice(): Double {
+        return (price.toDoubleOrNull() ?: 0.0) * quantity
+    }
+}

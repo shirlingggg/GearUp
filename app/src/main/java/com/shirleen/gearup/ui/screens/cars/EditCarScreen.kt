@@ -43,10 +43,8 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
     val car = remember(allCars) { allCars.find { it.id == carId } }
 
     // Local editable states
-    var brand by remember { mutableStateOf("") }
-    var model by remember { mutableStateOf("") }
-    var yearOfManufacture by remember { mutableStateOf("") }
-    var mileage by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf("") }
@@ -55,10 +53,8 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
     // Sync states with car whenever car changes
     LaunchedEffect(car) {
         car?.let {
-            brand = it.brand
-            model = it.model
-            yearOfManufacture = it.yearOfManufacture
-            mileage = it.mileage
+            name = it.name
+            description = it.description
             price = it.price
             phone = it.phone
             imageUri = it.imageUri
@@ -121,8 +117,8 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
             ) {
                 item {
                     OutlinedTextField(
-                        value = brand,
-                        onValueChange = { brand = it },
+                        value = name,
+                        onValueChange = { name = it },
                         label = { Text("Car Brand") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -134,8 +130,8 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                 }
                 item {
                     OutlinedTextField(
-                        value = model,
-                        onValueChange = { model = it },
+                        value = description,
+                        onValueChange = { description = it },
                         label = { Text("Car Model") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -145,34 +141,8 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                         )
                     )
                 }
-                item {
-                    OutlinedTextField(
-                        value = yearOfManufacture,
-                        onValueChange = { yearOfManufacture = it },
-                        label = { Text("Year of Manufacture") },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = newBluu,
-                            focusedLabelColor = newBluu,
-                            cursorColor = newBluu
-                        )
-                    )
-                }
-                item {
-                    OutlinedTextField(
-                        value = mileage,
-                        onValueChange = { mileage = it },
-                        label = { Text("Car Mileage") },
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = newBluu,
-                            focusedLabelColor = newBluu,
-                            cursorColor = newBluu
-                        )
-                    )
-                }
+
+
                 item {
                     OutlinedTextField(
                         value = price,
@@ -232,10 +202,8 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                     Button(
                         onClick = {
                             val updatedCar = car.copy(
-                                brand = brand,
-                                model = model,
-                                yearOfManufacture = yearOfManufacture,
-                                mileage = mileage,
+                                name = name,
+                                description = description,
                                 price = price,
                                 phone = phone,
                                 imageUri = imageUri

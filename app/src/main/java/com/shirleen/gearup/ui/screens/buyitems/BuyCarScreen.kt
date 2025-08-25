@@ -47,8 +47,8 @@ fun BuyCarScreen(
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredCars = carList.filter {
-        it.brand.contains(searchQuery, ignoreCase = true) ||
-                it.model.contains(searchQuery, ignoreCase = true)
+        it.name.contains(searchQuery, ignoreCase = true) ||
+                it.price.contains(searchQuery, ignoreCase = true)
     }
 
     Scaffold(
@@ -176,29 +176,18 @@ fun BuyCarItem(
                     .padding(12.dp)
             ) {
                 Text(
-                    text = "Brand: ${car.brand}",
+                    text = car.name,
                     fontSize = 17.sp,
                     color = Color.DarkGray
                 )
                 Text(
-                    text = "Model: ${car.model}",
+                    text = car.description,
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
+
                 Text(
-                    text = "Year: ${car.yearOfManufacture}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.DarkGray
-                )
-                Text(
-                    text = "Mileage: ${car.mileage}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.DarkGray
-                )
-                Text(
-                    text = "Price: Ksh ${car.price}",
+                    text = "Ksh ${car.price}",
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
@@ -213,7 +202,7 @@ fun BuyCarItem(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
                             smsIntent.data = "smsto:${car.phone}".toUri()
-                            smsIntent.putExtra("sms_body", "Hello Seller, I'm interested in your ${car.brand} ${car.model}")
+                            smsIntent.putExtra("sms_body", "Hello Seller, I'm interested in your ${car.name}")
                             context.startActivity(smsIntent)
                         },
                         shape = RoundedCornerShape(8.dp),
@@ -238,12 +227,15 @@ fun BuyCarItem(
                     IconButton(
                         onClick = {
                             val cartItem = CartItem(
-                                itemId = car.id,
-                                name = "${car.brand} ${car.model}",
+                                id = car.id,
+                                name = car.name,
+                                description = car.description,
                                 price = car.price,
-                                imageUrl = car.imageUri
+                                phone = car.phone,
+                                imageUri = car.imageUri,
+                                quantity = 1
                             )
-                            cartViewModel.insertItem(cartItem)
+                            cartViewModel.insert(cartItem)
                             navController.navigate(ROUT_CART)
                         }
                     ) {

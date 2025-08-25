@@ -1,104 +1,130 @@
 package com.shirleen.gearup.ui.screens.cart
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import com.shirleen.gearup.model.CartItem
 import com.shirleen.gearup.navigation.ROUT_CHECKOUT
 import com.shirleen.gearup.ui.theme.newBluu
 import com.shirleen.gearup.viewmodel.CartViewModel
+import androidx.navigation.NavController
+import com.shirleen.gearup.navigation.ROUT_CART
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
     navController: NavController,
-    viewModel: CartViewModel
+    cartViewModel: CartViewModel = viewModel()
 ) {
-    val cartItems by viewModel.allItems.collectAsState(initial = emptyList())
-    val subtotal by viewModel.subtotal.collectAsState(initial = 0.0)
+    val cartItems by cartViewModel.allCartItems.observeAsState(emptyList())
+    val totalPrice by cartViewModel.totalPrice.observeAsState(0.0)
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Your Cart", fontSize = 20.sp) },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = newBluu,
-                    titleContentColor = Color.White
+                title = {
+                    Text("My Cart", color = Color.White)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = newBluu
                 )
             )
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = Color.White,
-                contentColor = newBluu,
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+            if (cartItems.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Subtotal: Ksh ${"%.2f".format(subtotal ?: 0.0)}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Button(
-                        onClick = {
-                            navController.navigate(ROUT_CHECKOUT)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = newBluu)
-                    ) {
-                        Text("Proceed to Checkout", color = Color.White)
+                    Text("Your cart is empty")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(cartItems) { item ->
+                        CartItemRow(
+                            cartItem = item,
+                            onRemove = { cartViewModel.delete(item) },
+                            onIncrease = {
+                                val updated = item.copy(quantity = item.quantity + 1)
+                                cartViewModel.update(updated)
+                            },
+                            onDecrease = {
+                                if (item.quantity > 1) {
+                                    val updated = item.copy(quantity = item.quantity - 1)
+                                    cartViewModel.update(updated)
+                                }
+                            }
+                        )
                     }
                 }
-            }
-        },
-        containerColor = Color.LightGray
-    ) { paddingValues ->
-        if (cartItems.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Your cart is empty.",
-                    fontSize = 18.sp,
-                    color = Color.Gray
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-            ) {
-                items(cartItems) { item ->
-                    CartItemCard(item = item, viewModel = viewModel)
+
+                // Total section styled
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = newBluu.copy(alpha = 0.1f)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Total", style = MaterialTheme.typography.titleMedium, color = newBluu)
+                        Text(
+                            "KSh ${"%.2f".format(totalPrice)}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = newBluu
+                        )
+                    }
+                }
+
+                // Checkout button - lifted up a bit
+                Button(
+                    onClick = { navController.navigate(ROUT_CHECKOUT) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = newBluu,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Proceed to Checkout")
                 }
             }
         }
@@ -106,14 +132,20 @@ fun CartScreen(
 }
 
 @Composable
-fun CartItemCard(item: CartItem, viewModel: CartViewModel) {
+fun CartItemRow(
+    cartItem: CartItem,
+    onRemove: () -> Unit,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+            .padding(vertical = 6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
             modifier = Modifier
@@ -121,26 +153,52 @@ fun CartItemCard(item: CartItem, viewModel: CartViewModel) {
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = item.imageUrl,
-                contentDescription = "Cart item image",
+            // Product image
+            Image(
+                painter = rememberAsyncImagePainter(cartItem.imageUri),
+                contentDescription = cartItem.name,
                 modifier = Modifier
-                    .size(80.dp)
-                    .aspectRatio(1f),
+                    .size(70.dp)
+                    .padding(end = 12.dp),
                 contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = item.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Ksh ${"%.2f".format(item.price)}", fontSize = 16.sp, color = Color.DarkGray)
-            }
-            IconButton(onClick = { viewModel.deleteItem(item) }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove from cart",
-                    tint = Color.Red
+
+            // Name + price
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    cartItem.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+                Text(
+                    "KSh ${cartItem.price}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+            }
+
+            // Quantity controls
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onDecrease) {
+                    Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                }
+                Text(
+                    "${cartItem.quantity}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(horizontal = 6.dp)
+                )
+                IconButton(onClick = onIncrease) {
+                    Icon(Icons.Default.Add, contentDescription = "Increase")
+                }
+            }
+
+            // Remove button
+            IconButton(onClick = onRemove) {
+                Icon(Icons.Default.Delete, contentDescription = "Remove", tint = Color.Red)
             }
         }
     }

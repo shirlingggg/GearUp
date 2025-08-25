@@ -233,12 +233,15 @@ fun BuyerAccessoryItem(
                     IconButton(
                         onClick = {
                             val cartItem = CartItem(
-                                itemId = accessory.id,
+                                id = accessory.id,
                                 name = accessory.name,
+                                description = accessory.description,
                                 price = accessory.price,
-                                imageUrl = accessory.imageUri
+                                phone = accessory.phone,
+                                imageUri = accessory.imageUri,
+                                quantity = 1
                             )
-                            cartViewModel.insertItem(cartItem)
+                            cartViewModel.insert(cartItem)
                             navController.navigate(ROUT_CART)
                         }
                     ) {

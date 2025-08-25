@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "accessories")
 data class Accessory(
     @PrimaryKey(autoGenerate = true)
-    override val id: Int = 0,
-    override val name: String,
-    val description: String,
-    override val price: String,
-    val phone: String,
-    override val imageUri: String,
-): CartEligibleItem
+     val id: Int = 0,
+     val name: String,
+     val description: String,
+     val price: String,
+     val phone: String,
+     val imageUri: String,
+)

@@ -46,8 +46,8 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredCars = carList.filter {
-        it.brand.contains(searchQuery, ignoreCase = true) ||
-                it.model.contains(searchQuery, ignoreCase = true)
+        it.name.contains(searchQuery, ignoreCase = true) ||
+                it.price.contains(searchQuery, ignoreCase = true)
     }
 
     Scaffold(
@@ -190,32 +190,20 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
             ) {
                 // Car Details
                 Text(
-                    text = "Brand: ${car.brand}",
+                    text = car.name,
                     fontSize = 17.sp,
                     color = Color.DarkGray
                 )
 
                 Text(
-                    text = "Model: ${car.model}",
+                    text = car.description,
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
 
-                Text(
-                    text = "Year: ${car.yearOfManufacture}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.DarkGray
-                )
 
                 Text(
-                    text = "Mileage: ${car.mileage}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.DarkGray
-                )
-                Text(
-                    text = "Price: Ksh ${car.price}",
+                    text = "Ksh ${car.price}",
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
@@ -232,7 +220,7 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
                             smsIntent.data = "smsto:${car.phone}".toUri()
-                            smsIntent.putExtra("sms_body", "Hello Seller, I'm interested in your ${car.brand} ${car.model}")
+                            smsIntent.putExtra("sms_body", "Hello Seller, I'm interested in your ${car.name}")
                             context.startActivity(smsIntent)
                         },
                         shape = RoundedCornerShape(8.dp),

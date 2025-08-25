@@ -6,7 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.shirleen.gearup.model.CartItem
 
-@Database(entities = [CartItem::class], version = 1, exportSchema = false)
+
+@Database(entities = [CartItem::class], version = 2, exportSchema = false)
 abstract class CartDatabase : RoomDatabase() {
     abstract fun cartDao(): CartDao
 
@@ -20,7 +21,8 @@ abstract class CartDatabase : RoomDatabase() {
                     context.applicationContext,
                     CartDatabase::class.java,
                     "cart_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
