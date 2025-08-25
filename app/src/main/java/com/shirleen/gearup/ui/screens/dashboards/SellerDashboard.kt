@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,9 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,23 +57,50 @@ fun SellerDashboardScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Seller Dashboard", fontWeight = FontWeight.Bold, color = Color.White) },
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Seller Dashboard",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 24.sp
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f))
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = newBluu
                 )
             )
         },
         bottomBar = {
-            NavigationBar(containerColor = newBluu) {
+            NavigationBar(
+                containerColor = newBluu,
+                modifier = Modifier.shadow(elevation = 16.dp)
+            ) {
                 // Home/Dashboard Icon
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Dashboard") },
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = "Dashboard",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Dashboard") },
                     selected = currentRoute == ROUT_SELLERDASHBOARD,
                     onClick = {
@@ -84,8 +118,6 @@ fun SellerDashboardScreen(navController: NavController) {
                         unselectedTextColor = Color.White
                     )
                 )
-
-
             }
         },
         content = { paddingValues ->
@@ -93,19 +125,50 @@ fun SellerDashboardScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(Color.White)
-                    .padding(16.dp)
+                    .background(Color(0xFFF8F9FA))
             ) {
+                // Header Section
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(newBluu, newBlue)
+                                )
+                            )
+                            .padding(24.dp)
+                    ) {
+                        Column {
+                            Text(
+                                "Manage Your Listings",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                "Track and add new items to sell",
+                                fontSize = 14.sp,
+                                color = Color.White.copy(alpha = 0.9f),
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
+                    }
+                }
+
                 // Quick Actions to Add New Items
                 item {
                     Text(
                         "Add New Listing",
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 16.dp),
+                        color = Color.Black
                     )
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         QuickActionCard(
@@ -113,28 +176,49 @@ fun SellerDashboardScreen(navController: NavController) {
                             icon = Icons.Default.DirectionsCar,
                             onClick = { navController.navigate(ROUT_ADD_CAR) }
                         )
+                        Spacer(modifier = Modifier.width(16.dp))
                         QuickActionCard(
                             title = "Add Accessory",
-                            icon = Icons.Default.ShoppingCart,
+                            icon = Icons.Default.Build, // Changed from ShoppingCart to Build
                             onClick = { navController.navigate(ROUT_ADD_ACCESSORY) }
                         )
                     }
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
 
                 // My Listings Section
                 item {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        "My Listings",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "My Listings",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                        Text(
+                            "${myListings.size} Items",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
                 // List of current listings
                 items(myListings) { listing ->
                     ListingCard(listing)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
             }
         }
@@ -146,10 +230,12 @@ fun QuickActionCard(title: String, icon: androidx.compose.ui.graphics.vector.Ima
     Card(
         modifier = Modifier
             .width(150.dp)
-            .height(100.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+            .height(120.dp)
+            .clickable(onClick = onClick)
+            .shadow(8.dp, RoundedCornerShape(16.dp), spotColor = newBlue.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -158,14 +244,28 @@ fun QuickActionCard(title: String, icon: androidx.compose.ui.graphics.vector.Ima
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = newBlue,
-                modifier = Modifier.size(32.dp)
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .background(newBlue.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = newBlue,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -173,33 +273,60 @@ fun QuickActionCard(title: String, icon: androidx.compose.ui.graphics.vector.Ima
 @Composable
 fun ListingCard(listing: SellerListing) {
     Card(
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(horizontal = 20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Use the image resource ID from the listing data
+            // Image with better styling
             Image(
                 painter = painterResource(id = listing.imageRes),
                 contentDescription = listing.name,
                 modifier = Modifier
                     .size(80.dp)
-                    .background(Color.LightGray, RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.LightGray),
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(listing.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(
+                    listing.name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     listing.price,
                     color = newBlue,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+                // Add a tag to show if it's a car or accessory
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (listing.isCar) newBlue.copy(alpha = 0.1f) else Color.Green.copy(alpha = 0.1f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        if (listing.isCar) "CAR" else "ACCESSORY",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (listing.isCar) newBlue else newBlue
+                    )
+                }
             }
+
 
         }
     }

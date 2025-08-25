@@ -3,7 +3,7 @@ package com.shirleen.gearup.ui.screens.buyitems
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,18 +20,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.shirleen.gearup.model.Accessory
 import com.shirleen.gearup.model.CartItem
 import com.shirleen.gearup.navigation.ROUT_CART
 import com.shirleen.gearup.ui.theme.newBluu
 import com.shirleen.gearup.viewmodel.AccessoryViewModel
-import com.shirleen.gearup.viewmodel.CartViewModel // Import the CartViewModel
+import com.shirleen.gearup.viewmodel.CartViewModel
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +41,7 @@ import com.shirleen.gearup.viewmodel.CartViewModel // Import the CartViewModel
 fun BuyAccessoriesScreen(
     viewModel: AccessoryViewModel,
     navController: NavController,
-    cartViewModel: CartViewModel // Add the cartViewModel as a parameter
+    cartViewModel: CartViewModel
 ) {
     val allAccessories by viewModel.allAccessories.collectAsState(initial = emptyList())
     var searchQuery by remember { mutableStateOf("") }
@@ -67,15 +69,13 @@ fun BuyAccessoriesScreen(
                         }
                     },
                     actions = {
-                        // Cart Button
                         IconButton(onClick = { navController.navigate(ROUT_CART) }) {
                             Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart", tint = Color.White)
                         }
                     }
-
                 )
 
-                //Search Bar
+                // Search Bar
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -107,25 +107,6 @@ fun BuyAccessoriesScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-
-                if (filteredAccessories.isEmpty()) {
-                    Text(
-                        text = "Oops! We don't have that.",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center),
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray
-                    )
-                } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(bottom = 80.dp)
-                    ) {
-                        items(filteredAccessories) { accessory ->
-                            BuyerAccessoryItem(navController, accessory, cartViewModel) // Pass cartViewModel here
-                        }
-                    }
-                }
             }
         },
         containerColor = Color.LightGray
@@ -146,10 +127,11 @@ fun BuyAccessoriesScreen(
                 }
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(bottom = 80.dp)
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(filteredAccessories) { accessory ->
-                        BuyerAccessoryItem(navController, accessory, cartViewModel) // Pass cartViewModel here
+                        BuyerAccessoryItem(navController, accessory, cartViewModel)
                     }
                 }
             }
@@ -161,46 +143,73 @@ fun BuyAccessoriesScreen(
 fun BuyerAccessoryItem(
     navController: NavController,
     accessory: Accessory,
-    cartViewModel: CartViewModel // Add cartViewModel as a parameter
+    cartViewModel: CartViewModel
 ) {
-    val painter = rememberAsyncImagePainter(model = accessory.imageUri)
     val context = LocalContext.current
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+            .padding(horizontal = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = painter,
+            // Use AsyncImage with proper error handling
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(accessory.imageUri)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "Accessory Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp),
-                contentScale = ContentScale.Crop
+                    .height(280.dp)
+                    .background(Color.LightGray), // Fallback background
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(android.R.drawable.ic_menu_gallery), // Placeholder while loading
+                error = painterResource(android.R.drawable.ic_menu_report_image) // Error placeholder
             )
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(16.dp)
             ) {
-                Text(text = accessory.name, fontSize = 20.sp, color = Color.DarkGray)
-                Text(text = accessory.description, fontSize = 16.sp, color = Color.DarkGray)
-                Text(text = "Ksh ${accessory.price}", fontSize = 16.sp, color = Color.DarkGray)
-                Text(text = "Seller: ${accessory.phone}", fontSize = 16.sp, color = Color.DarkGray)
-
+                Text(
+                    text = accessory.name,
+                    fontSize = 20.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = accessory.description,
+                    fontSize = 16.sp,
+                    color = Color.DarkGray
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Ksh ${accessory.price}",
+                    fontSize = 18.sp,
+                    color = newBluu,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Seller: ${accessory.phone}",
+                    fontSize = 14.sp,
+                    color = Color.Gray
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Message Seller (buyers only)
+                    // Message Seller Button
                     Button(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
@@ -215,22 +224,24 @@ fun BuyerAccessoryItem(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = newBluu,
                             contentColor = Color.White
-                        )
+                        ),
+                        modifier = Modifier.weight(0.7f)
                     ) {
-                        Row {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Send,
-                                contentDescription = "Message Seller"
+                                contentDescription = "Message Seller",
+                                modifier = Modifier.size(18.dp)
                             )
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text(text = "Message Seller")
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "Message")
                         }
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
 
-                    // Add to Cart
-                    Text(text = "Add To cart", modifier = Modifier.padding(top = 17.dp))
-                    IconButton(
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Add to Cart Button
+                    Button(
                         onClick = {
                             val cartItem = CartItem(
                                 id = accessory.id,
@@ -243,12 +254,19 @@ fun BuyerAccessoryItem(
                             )
                             cartViewModel.insert(cartItem)
                             navController.navigate(ROUT_CART)
-                        }
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = newBluu
+                        ),
+                        border = ButtonDefaults.outlinedButtonBorder,
+                        modifier = Modifier.weight(0.3f)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Shopping cart",
-                            tint = newBluu
+                            contentDescription = "Add to Cart",
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }

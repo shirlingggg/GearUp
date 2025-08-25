@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -32,8 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.shirleen.gearup.navigation.ROUT_BUYERPROFILESCREEN
-import com.shirleen.gearup.navigation.ROUT_CAR_LIST
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
 import com.shirleen.gearup.R
@@ -80,9 +79,10 @@ fun BuyerDashboardScreen(navController: NavController) {
                 title = {
                     Text(
                         "GearUp",
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = Color.White,
-                        fontSize = 40.sp
+                        fontSize = 28.sp,
+                        letterSpacing = 1.sp
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -95,17 +95,30 @@ fun BuyerDashboardScreen(navController: NavController) {
         },
         bottomBar = {
             NavigationBar(
-                containerColor = newBluu
+                containerColor = newBluu,
+                modifier = Modifier.shadow(elevation = 16.dp)
             ) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = "Home",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Home") },
                     selected = selectedIndex == 0,
                     onClick = { selectedIndex = 0 },
                     colors = navBarColors
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
+                    icon = {
+                        Icon(
+                            Icons.Default.ShoppingCart,
+                            contentDescription = "Cart",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
                     label = { Text("Cart") },
                     selected = selectedIndex == 1,
                     onClick = {
@@ -113,7 +126,6 @@ fun BuyerDashboardScreen(navController: NavController) {
                     },
                     colors = navBarColors
                 )
-
             }
         },
         content = { paddingValues ->
@@ -133,11 +145,11 @@ fun BuyerDashboardScreen(navController: NavController) {
                                     colors = listOf(newBluu, newBlue)
                                 )
                             )
-                            .padding(20.dp)
+                            .padding(24.dp)
                     ) {
                         Text(
                             text = "Welcome!",
-                            fontSize = 24.sp,
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -145,7 +157,7 @@ fun BuyerDashboardScreen(navController: NavController) {
                             "Find your perfect car and accessories",
                             fontSize = 16.sp,
                             color = Color.White.copy(alpha = 0.9f),
-                            modifier = Modifier.padding(top = 4.dp)
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -154,24 +166,24 @@ fun BuyerDashboardScreen(navController: NavController) {
                 item {
                     Text(
                         "Quick Actions",
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+                        modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 16.dp),
                         color = Color.Black
                     )
                 }
                 item {
                     Row(
                         modifier = Modifier
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = 20.dp)
                             .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         val quickActions = listOf(
                             QuickAction("Buy a Car", Icons.Default.DirectionsCar, newBlue,
                                 ROUT_BUYCAR
                             ),
-                            QuickAction("Accessories", Icons.Default.ShoppingCart, newBlue,
+                            QuickAction("Accessories", Icons.Default.Build, newBlue,
                                 ROUT_BUYACCESSORY
                             )
                         )
@@ -180,7 +192,7 @@ fun BuyerDashboardScreen(navController: NavController) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .width(120.dp) // Adjusted width for two items
+                                    .width(120.dp)
                                     .clickable {
                                         if (route.isNotEmpty()) {
                                             navController.navigate(route)
@@ -189,8 +201,8 @@ fun BuyerDashboardScreen(navController: NavController) {
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(60.dp)
-                                        .shadow(4.dp, CircleShape)
+                                        .size(70.dp)
+                                        .shadow(8.dp, CircleShape, spotColor = color.copy(alpha = 0.3f))
                                         .background(Color.White, CircleShape)
                                         .clip(CircleShape),
                                     contentAlignment = Alignment.Center
@@ -199,22 +211,23 @@ fun BuyerDashboardScreen(navController: NavController) {
                                         icon,
                                         contentDescription = title,
                                         tint = color,
-                                        modifier = Modifier.size(28.dp)
+                                        modifier = Modifier.size(32.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     title,
-                                    fontSize = 12.sp,
+                                    fontSize = 14.sp,
                                     textAlign = TextAlign.Center,
-                                    fontWeight = FontWeight.Medium,
+                                    fontWeight = FontWeight.SemiBold,
                                     maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    color = Color.DarkGray
                                 )
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
 
                 // Featured Cars Section
@@ -222,13 +235,13 @@ fun BuyerDashboardScreen(navController: NavController) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 24.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             "Featured Cars",
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
@@ -236,20 +249,24 @@ fun BuyerDashboardScreen(navController: NavController) {
                             "View All",
                             fontSize = 14.sp,
                             color = newBlue,
-                            modifier = Modifier.clickable {navController.navigate(ROUT_CAR_LIST)}
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .clickable { navController.navigate(ROUT_BUYCAR) }
+                                .padding(8.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(featuredCars) { car ->
                             FeaturedItemCard(item = car)
                         }
                     }
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
 
                 // Featured Accessories Section
@@ -257,13 +274,13 @@ fun BuyerDashboardScreen(navController: NavController) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                            .padding(horizontal = 24.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             "Featured Accessories",
-                            fontSize = 18.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
@@ -271,15 +288,18 @@ fun BuyerDashboardScreen(navController: NavController) {
                             "View All",
                             fontSize = 14.sp,
                             color = newBlue,
-                            modifier = Modifier.clickable { navController.navigate(ROUT_BUYACCESSORY) }
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier
+                                .clickable { navController.navigate(ROUT_BUYACCESSORY) }
+                                .padding(8.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(featuredAccessories) { accessory ->
                             FeaturedItemCard(item = accessory)
@@ -297,9 +317,14 @@ fun FeaturedItemCard(item: FeaturedItem) {
     Card(
         modifier = Modifier
             .width(280.dp)
-            .height(200.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+            .height(220.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp,
+            pressedElevation = 4.dp,
+            focusedElevation = 12.dp
+        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -309,24 +334,38 @@ fun FeaturedItemCard(item: FeaturedItem) {
                 contentScale = ContentScale.Crop
             )
 
+            // Gradient overlay for better text readability
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            startY = 300f
+                        )
+                    )
+            )
+
             // Item info
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.7f))
-                    .padding(12.dp)
+                    .padding(16.dp)
             ) {
                 Text(
                     item.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     item.price,
                     fontSize = 14.sp,
-                    color = newBlue,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
