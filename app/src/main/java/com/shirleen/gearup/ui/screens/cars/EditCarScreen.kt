@@ -119,7 +119,7 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Car Brand") },
+                        label = { Text("Name") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = newBluu,
@@ -132,7 +132,7 @@ fun EditCarScreen(carId: Int?, navController: NavController, viewModel: CarViewM
                     OutlinedTextField(
                         value = description,
                         onValueChange = { description = it },
-                        label = { Text("Car Model") },
+                        label = { Text("Description") },
                         modifier = Modifier.fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = newBluu,

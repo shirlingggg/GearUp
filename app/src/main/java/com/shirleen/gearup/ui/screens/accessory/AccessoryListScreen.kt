@@ -123,7 +123,7 @@ fun AccessoryListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 12.dp, vertical = 8.dp),
-                        placeholder = { Text("Search cars...") },
+                        placeholder = { Text("Search accessories...") },
                         singleLine = true,
                         leadingIcon = {
                             Icon(
@@ -264,9 +264,13 @@ fun AccessoryItem(
                     .fillMaxWidth()
                     .padding(12.dp)
             ) {
-                Text(text = accessory.name, fontSize = 20.sp, color = Color.DarkGray)
+                Text(text = accessory.name, fontSize = 20.sp, color = Color.Black)
+                Spacer(modifier = Modifier.height(5.dp))
+
                 Text(text = accessory.description, fontSize = 16.sp, color = Color.DarkGray)
-                Text(text = "Ksh ${accessory.price}", fontSize = 16.sp, color = Color.DarkGray)
+                Spacer(modifier = Modifier.height(5.dp))
+
+                Text(text = "Ksh ${accessory.price}", fontSize = 16.sp, color = Color.DarkGray, fontWeight = FontWeight.ExtraBold)
                 Text(text = "Seller: ${accessory.phone}", fontSize = 16.sp, color = Color.DarkGray)
 
                 Spacer(modifier = Modifier.height(8.dp))

@@ -191,21 +191,26 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                 // Car Details
                 Text(
                     text = car.name,
-                    fontSize = 17.sp,
-                    color = Color.DarkGray
+                    fontSize = 20.sp,
+                    color = Color.Black
                 )
+
+                Spacer(modifier = Modifier.height(5.dp))
+
 
                 Text(
                     text = car.description,
                     fontSize = 16.sp,
                     color = Color.DarkGray
                 )
+                Spacer(modifier = Modifier.height(5.dp))
 
 
                 Text(
                     text = "Ksh ${car.price}",
                     fontSize = 16.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,
+                    fontWeight = FontWeight.ExtraBold
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
