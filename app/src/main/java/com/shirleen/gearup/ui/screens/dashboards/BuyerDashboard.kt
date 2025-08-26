@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,6 +41,7 @@ import com.shirleen.gearup.navigation.ROUT_BUYACCESSORY
 import com.shirleen.gearup.navigation.ROUT_BUYCAR
 import com.shirleen.gearup.navigation.ROUT_CART
 import androidx.compose.ui.layout.ContentScale
+import com.shirleen.gearup.navigation.ROUT_ABOUT
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -185,6 +187,10 @@ fun BuyerDashboardScreen(navController: NavController) {
                             ),
                             QuickAction("Accessories", Icons.Default.Build, newBlue,
                                 ROUT_BUYACCESSORY
+                            ),
+
+                            QuickAction("About", Icons.Default.Info, newBlue,
+                                ROUT_ABOUT
                             )
                         )
 

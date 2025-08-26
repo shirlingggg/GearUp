@@ -3,9 +3,11 @@ package com.shirleen.gearup.ui.screens.dashboards
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.shirleen.gearup.R
+import com.shirleen.gearup.navigation.ROUT_ABOUT
 import com.shirleen.gearup.navigation.ROUT_ADD_ACCESSORY
 import com.shirleen.gearup.navigation.ROUT_ADD_CAR
 import com.shirleen.gearup.navigation.ROUT_SELLERDASHBOARD
@@ -75,10 +78,12 @@ fun SellerDashboardScreen(navController: NavController) {
                             .background(Color.White.copy(alpha = 0.2f))
                     ) {
                         Icon(
+
                             Icons.Default.ArrowBack,
                             contentDescription = "Back",
                             tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
+
                         )
                     }
                 },
@@ -168,7 +173,9 @@ fun SellerDashboardScreen(navController: NavController) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 20.dp)
+                            .horizontalScroll(rememberScrollState()),
+
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         QuickActionCard(
@@ -176,12 +183,21 @@ fun SellerDashboardScreen(navController: NavController) {
                             icon = Icons.Default.DirectionsCar,
                             onClick = { navController.navigate(ROUT_ADD_CAR) }
                         )
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                         QuickActionCard(
                             title = "Add Accessory",
                             icon = Icons.Default.Build, // Changed from ShoppingCart to Build
                             onClick = { navController.navigate(ROUT_ADD_ACCESSORY) }
                         )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        QuickActionCard(
+                            title = "About us",
+                            icon = Icons.Default.Info,
+                            onClick = { navController.navigate(ROUT_ABOUT) }
+                        )
+
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                 }
