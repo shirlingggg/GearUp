@@ -1,5 +1,6 @@
 package com.shirleen.gearup.ui.screens.checkout
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,30 +24,13 @@ import com.shirleen.gearup.navigation.ROUT_CAR_LIST
 import com.shirleen.gearup.navigation.ROUT_PAYMENT
 import com.shirleen.gearup.ui.theme.newBlue
 import com.shirleen.gearup.ui.theme.newBluu
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckOutScreen(navController: NavController) {
     val mContext = LocalContext.current
     var showCashMessage by remember { mutableStateOf(false) }
-    var isMpesaProcessing by remember { mutableStateOf(false) }
-
-    // Use a LaunchedEffect to handle the mock payment process
-    if (isMpesaProcessing) {
-        LaunchedEffect(Unit) {
-            // Simulate API call delay
-            delay(3000)
-            isMpesaProcessing = false
-            // Navigate to payment success screen
-            navController.navigate(ROUT_PAYMENT) {
-                // Clear the back stack so user can't go back to checkout
-                popUpTo(navController.currentBackStackEntry?.destination?.route ?: "checkout") {
-                    inclusive = true
-                }
-            }
-        }
-    }
+    var showMpesaDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -63,9 +47,7 @@ fun CheckOutScreen(navController: NavController) {
                 ),
                 navigationIcon = {
                     IconButton(onClick = {
-                        if (!isMpesaProcessing) {
-                            navController.popBackStack()
-                        }
+                        navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
@@ -84,74 +66,47 @@ fun CheckOutScreen(navController: NavController) {
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                if (isMpesaProcessing) {
-                    // Show processing UI
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.padding(24.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            color = newBlue,
-                            modifier = Modifier.size(64.dp)
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            text = "Processing M-Pesa Payment",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = newBluu
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Please wait while we process your payment...",
-                            fontSize = 16.sp,
-                            color = Color.DarkGray,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                } else {
-                    // Show payment options
-                    Column(
+                // Show payment options
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Header
+                    Text(
+                        text = "Complete Your Purchase",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = newBluu,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Text(
+                        text = "Choose your preferred payment method",
+                        fontSize = 16.sp,
+                        color = Color.DarkGray,
+                        modifier = Modifier.padding(bottom = 32.dp)
+                    )
+
+                    // Payment method cards
+                    PaymentMethodCard(
+                        title = "M-Pesa",
+                        description = "Pay securely with M-Pesa",
+                        onClick = { showMpesaDialog = true },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Header
-                        Text(
-                            text = "Complete Your Purchase",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = newBluu,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                            .padding(vertical = 8.dp)
+                    )
 
-                        Text(
-                            text = "Choose your preferred payment method",
-                            fontSize = 16.sp,
-                            color = Color.DarkGray,
-                            modifier = Modifier.padding(bottom = 32.dp)
-                        )
-
-                        // Payment method cards
-                        PaymentMethodCard(
-                            title = "M-Pesa",
-                            description = "Pay securely with M-Pesa",
-                            onClick = { isMpesaProcessing = true },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        )
-
-                        PaymentMethodCard(
-                            title = "Cash on Delivery",
-                            description = "Pay when you receive your items",
-                            onClick = { showCashMessage = true },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                        )
-                    }
+                    PaymentMethodCard(
+                        title = "Cash on Delivery",
+                        description = "Pay when you receive your items",
+                        onClick = { showCashMessage = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    )
                 }
 
                 // Cash payment dialog
@@ -190,6 +145,61 @@ fun CheckOutScreen(navController: NavController) {
                             TextButton(
                                 onClick = { showCashMessage = false }
                             ) {
+                                Text("Cancel")
+                            }
+                        }
+                    )
+                }
+
+                // Mpesa payment dialog
+                if (showMpesaDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showMpesaDialog = false },
+                        title = {
+                            Text(
+                                text = "M-Pesa Payment",
+                                fontWeight = FontWeight.Bold,
+                                color = newBluu
+                            )
+                        },
+                        text = {
+                            Text(
+                                "Please send the payment to the seller’s M-Pesa number shown on the product page.\n\n" +
+                                        "After sending, contact the seller to verify payment and arrange delivery."
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showMpesaDialog = false
+                                    try {
+                                        val simToolKitLaunchIntent =
+                                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+                                        simToolKitLaunchIntent?.let {
+                                            mContext.startActivity(it) // Open SIM Toolkit
+                                        } ?: run {
+                                            Toast.makeText(
+                                                mContext,
+                                                "SIM Toolkit not found on this device",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        Toast.makeText(
+                                            mContext,
+                                            "Unable to open SIM Toolkit",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = newBlue)
+                            ) {
+                                Text("Open SIM Toolkit")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showMpesaDialog = false }) {
                                 Text("Cancel")
                             }
                         }
