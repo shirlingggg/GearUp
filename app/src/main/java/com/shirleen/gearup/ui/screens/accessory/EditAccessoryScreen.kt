@@ -111,7 +111,8 @@ fun EditAccessoryScreen(accessoryId: Int?, navController: NavController, viewMod
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .background(color = Color(0xFFF8F9FA)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {

@@ -131,13 +131,14 @@ fun CarListScreen(navController: NavController, viewModel: CarViewModel) {
             }
         },
         bottomBar = { BottomNavigationBar1(navController) },
-        containerColor = Color.LightGray
+        containerColor = Color(0xFFF8F9FA),
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
+
         ) {
             LazyColumn(
                 contentPadding = PaddingValues(bottom = 80.dp) // ✅ ensures last item is fully visible
@@ -220,29 +221,7 @@ fun CarItem(navController: NavController, car: Car, viewModel: CarViewModel) {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Message Seller
-                    Button(
-                        onClick = {
-                            val smsIntent = Intent(Intent.ACTION_SENDTO)
-                            smsIntent.data = "smsto:${car.phone}".toUri()
-                            smsIntent.putExtra("sms_body", "Hello Seller, I'm interested in your ${car.name}")
-                            context.startActivity(smsIntent)
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = newBluu,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.Send,
-                                contentDescription = "Message Seller"
-                            )
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text(text = "Message Seller")
-                        }
-                    }
+
 
                     // Edit Car
                     IconButton(

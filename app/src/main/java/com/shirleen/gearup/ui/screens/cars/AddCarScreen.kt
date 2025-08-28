@@ -94,7 +94,7 @@ fun AddCarScreen(navController: NavController, viewModel: CarViewModel) {
         bottomBar = {
             BottomNavigationBar(navController)
         },
-        containerColor = Color.LightGray,
+        containerColor = Color(0xFFF8F9FA),
         content = { paddingValues ->
             LazyColumn(
                 modifier = Modifier

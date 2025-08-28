@@ -1,6 +1,7 @@
 package com.shirleen.gearup.ui.screens.cart
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -58,6 +59,7 @@ fun CartScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
+                .background(color = Color(0xFFF8F9FA))
         ) {
             if (cartItems.isEmpty()) {
                 Box(

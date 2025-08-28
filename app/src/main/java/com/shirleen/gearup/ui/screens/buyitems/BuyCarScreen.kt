@@ -61,7 +61,7 @@ fun BuyCarScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text("Cars", fontSize = 20.sp) },
+                    title = { Text("Buy Cars", fontSize = 20.sp) },
                     colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = newBluu,
                         titleContentColor = Color.White
@@ -125,7 +125,7 @@ fun BuyCarScreen(
                 }
             }
         },
-        containerColor = Color.LightGray
+        containerColor = Color(0xFFF8F9FA),
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -239,9 +239,7 @@ fun BuyCarItem(
                 Text(
                     text = car.description,
                     fontSize = 16.sp,
-                    color = Color.DarkGray,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    color = Color.DarkGray
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(

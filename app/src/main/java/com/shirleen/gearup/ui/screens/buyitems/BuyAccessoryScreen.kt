@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -54,7 +55,7 @@ fun BuyAccessoriesScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    title = { Text("Accessories", fontSize = 20.sp) },
+                    title = { Text(" Buy Accessories", fontSize = 20.sp) },
                     colors = TopAppBarDefaults.mediumTopAppBarColors(
                         containerColor = newBluu,
                         titleContentColor = Color.White
@@ -79,7 +80,9 @@ fun BuyAccessoriesScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 10.dp, end = 10.dp),
+                        .padding(top = 16.dp, start = 10.dp, end = 10.dp)
+                        .shadow(8.dp, RoundedCornerShape(16.dp)),
+
                     shape = RoundedCornerShape(16.dp),
                     color = Color.White,
                 ) {
@@ -109,7 +112,8 @@ fun BuyAccessoriesScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         },
-        containerColor = Color.LightGray
+        containerColor = Color(0xFFF8F9FA)
+
     ) { paddingValues ->
         Column(
             modifier = Modifier

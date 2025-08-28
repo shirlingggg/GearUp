@@ -195,7 +195,7 @@ fun AccessoryListScreen(
 
             }
         },
-        containerColor = Color.LightGray
+        containerColor = Color(0xFFF8F9FA)
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -279,32 +279,7 @@ fun AccessoryItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Message Seller (visible to both)
-                    Button(
-                        onClick = {
-                            val smsIntent = Intent(Intent.ACTION_SENDTO)
-                            smsIntent.data = "smsto:${accessory.phone}".toUri()
-                            smsIntent.putExtra(
-                                "sms_body",
-                                "Hello, I'm inerested in ${accessory.name}, could you tell me more about it..."
-                            )
-                            context.startActivity(smsIntent)
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = newBluu,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Row {
-                            Icon(
-                                imageVector = Icons.Default.Send,
-                                contentDescription = "Message Seller"
-                            )
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text(text = "Message Seller")
-                        }
-                    }
+
 
 
                     // Edit Accessory
